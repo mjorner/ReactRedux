@@ -25,23 +25,24 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public IEnumerable<ReadingFilenames> GetFilenames() {
             List<ReadingFilenames> list = new List<ReadingFilenames>();
-            list.Add(new ReadingFilenames() {OutFile = "attictemp.out", CsvFile = "attictemp.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "edithtemp.out", CsvFile = "edithtemp.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "ellietemp.out", CsvFile = "ellietemp.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "freezer.out", CsvFile = "freezer.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "fridge.out", CsvFile = "fridge.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "garagetemp.out", CsvFile = "garagetemp.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "outsidelightlux.out", CsvFile = "outsidelightlux.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "outsideroom.out", CsvFile = "outsideroom.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "outsidetemp2.out", CsvFile = "outsidetemp2.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "outsidetemp.out", CsvFile = "outsidetemp.csv"});
-            list.Add(new ReadingFilenames() {OutFile = "pooltemp.out", CsvFile = "pooltemp.csv"});
+            list.Add(new ReadingFilenames() { OutFile = "attictemp.out", CsvFile = "attictemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "edithtemp.out", CsvFile = "edithtemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "ellietemp.out", CsvFile = "ellietemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "freezer.out", CsvFile = "freezer.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "fridge.out", CsvFile = "fridge.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "garagetemp.out", CsvFile = "garagetemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidelightlux.out", CsvFile = "outsidelightlux.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "outsideroom.out", CsvFile = "outsideroom.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidetemp2.out", CsvFile = "outsidetemp2.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidetemp.out", CsvFile = "outsidetemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "pooltemp.out", CsvFile = "pooltemp.csv" });
             return list;
         }
 
         [HttpGet("[action]")]
         public IEnumerable<TempReading> WeatherForecasts(string filename) {
             List<TempReading> list = new List<TempReading>();
+            double prevRead = 0;
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
                     while (!reader.EndOfStream) {
@@ -52,7 +53,10 @@ namespace ReactRedux.Controllers {
                         double d;
                         if (double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
                             reading.TemperatureC = d;
-                            list.Add(reading);
+                            if (!IsApproximatelyEqualTo(prevRead, d)) {
+                                list.Add(reading);
+                                prevRead = d;
+                            }
                         } else {
                             Console.WriteLine($"Unable to parse double: {parts[1]}");
                         }
@@ -62,6 +66,28 @@ namespace ReactRedux.Controllers {
                 Console.WriteLine(ex);
             }
             return list;
+        }
+
+        [HttpGet("[action]")]
+        public OutResult ReadFile(string filename) {
+            string line = "";
+            try {
+                using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
+                    line = reader.ReadLine();
+                }
+            } catch (Exception ex) {
+                Console.WriteLine(ex);
+            }
+            return new OutResult() { Str = line, Filename = filename };
+        }
+
+        private static bool IsApproximatelyEqualTo(double initialValue, double value) {
+            return (Math.Abs(initialValue - value) < 0.00001);
+        }
+
+        public class OutResult {
+            public string Str { get; set; }
+            public string Filename { get; set; }
         }
 
         public class TempReading {
