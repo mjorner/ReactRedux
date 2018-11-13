@@ -61,6 +61,7 @@ namespace ReactRedux.Controllers {
                             Console.WriteLine($"Unable to parse double: {parts[1]}");
                         }
                     }
+                    reader.Close();
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex);
@@ -74,6 +75,7 @@ namespace ReactRedux.Controllers {
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
                     line = reader.ReadLine();
+                    reader.Close();
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex);
