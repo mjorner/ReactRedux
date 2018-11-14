@@ -9,12 +9,10 @@ class FetchData extends Component {
 
   constructor(props) {
     super(props);
-    // Don't call this.setState() here!
     this.state = { filecontent: [],};
   }
 
   async componentDidMount() {
-
       const url = "api/SampleData/GetFilenames"
       fetch(url)
       .then(results => {return results.json();})
@@ -25,19 +23,19 @@ class FetchData extends Component {
         const all = await Promise.all(allGraphs);
         this.setState({filecontent: all});
       });
-      }
+    }
 
-      async doRenderGraphFromFile(filename) {
-        const url = "api/SampleData/WeatherForecasts?filename="+filename;
-        const d = await fetch(url);
-        const data = await d.json();
-        const filecontent = renderGraph(data, filename);
-        return filecontent;
-      }
+    async doRenderGraphFromFile(filename) {
+      const url = "api/SampleData/WeatherForecasts?filename="+filename;
+      const d = await fetch(url);
+      const data = await d.json();
+      const filecontent = renderGraph(data, filename);
+      return filecontent;
+    }
 
   render() {
     return (
-      <div class="shit">{this.state.filecontent}</div>
+      <div>{this.state.filecontent}</div>
     )
   }
 }
@@ -48,7 +46,7 @@ function renderGraph(forecasts, filename) {
       data={[
         {type: 'scatter', line: {shape: 'spline'}, x: createDates(forecasts), y: createTemps(forecasts)},
       ]}
-      layout={ {width: 700, height: 300, title: filename} }
+      layout={ {width: 500, height: 300, title: filename} }
     />
   );
 }

@@ -9,30 +9,28 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
-    // Don't call this.setState() here!
     this.state = { filecontent: [],};
   }
 
   async componentDidMount() {
+    const url = "api/SampleData/GetFilenames"
+    fetch(url)
+    .then(results => {return results.json();})
+    .then(async data => {
+      const allGraphs = data.map(async file => {
+        return await this.doReadFile(file.outFile);
+      })
+      const all = await Promise.all(allGraphs);
+      this.setState({filecontent: all});
+    });
+  }
 
-      const url = "api/SampleData/GetFilenames"
-      fetch(url)
-      .then(results => {return results.json();})
-      .then(async data => {
-        const allGraphs = data.map(async file => {
-          return await this.doReadFile(file.outFile);
-        })
-        const all = await Promise.all(allGraphs);
-        this.setState({filecontent: all});
-      });
-      }
-
-      async doReadFile(filename) {
-        const url = "api/SampleData/ReadFile?filename="+filename;
-        const d = await fetch(url);
-        const data = await d.json();
-        return data;
-      }
+  async doReadFile(filename) {
+    const url = "api/SampleData/ReadFile?filename="+filename;
+    const d = await fetch(url);
+    const data = await d.json();
+    return data;
+  }
 
   render() {
     return (
