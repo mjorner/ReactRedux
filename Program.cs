@@ -20,6 +20,9 @@ namespace ReactRedux
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseKestrel(options => {
+                    options.Limits.MaxConcurrentConnections = 100;
+                })
                 .UseUrls("http://0.0.0.0:4000");
     }
 }

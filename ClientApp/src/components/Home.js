@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actionCreators } from '../store/WeatherForecasts';
-import Plot from 'react-plotly.js';
-
 
 class Home extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { filecontent: [],};
+    this.state = { filecontent: null};
   }
 
   async componentDidMount() {
@@ -33,11 +31,17 @@ class Home extends Component {
   }
 
   render() {
-    return (
-      <div>
-        {renderForecastsTable(this.state.filecontent)}
-      </div>
-    )
+    if (this.state.filecontent === null) {
+      return (
+        <div>Loading data...</div>
+      )
+    } else {
+      return (
+        <div>
+          {renderForecastsTable(this.state.filecontent)}
+        </div>
+      )
+    }
   }
 }
 

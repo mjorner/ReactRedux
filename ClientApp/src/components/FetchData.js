@@ -4,39 +4,57 @@ import { connect } from 'react-redux';
 import { actionCreators } from '../store/WeatherForecasts';
 import Plot from 'react-plotly.js';
 
-
 class FetchData extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { filecontent: [],};
+    this.state = { filecontent: null,};
   }
 
   async componentDidMount() {
-      const url = "api/SampleData/GetFilenames"
-      fetch(url)
-      .then(results => {return results.json();})
-      .then(async data => {
-        const allGraphs = data.map(async file => {
-          return await this.doRenderGraphFromFile(file.csvFile);
-        })
-        const all = await Promise.all(allGraphs);
-        this.setState({filecontent: all});
-      });
+    const url = "api/SampleData/GetFilenames"
+    const data = await fetch(url);
+    const json = await data.json();
+    var i;
+    var arr = [];
+    for (i = 0; i < json.length; i++) {
+      arr.push("Loading...");
     }
+    this.setState({filecontent: arr});
 
-    async doRenderGraphFromFile(filename) {
-      const url = "api/SampleData/WeatherForecasts?filename="+filename;
-      const d = await fetch(url);
-      const data = await d.json();
-      const filecontent = renderGraph(data, filename);
-      return filecontent;
+    for (i = 0; i < json.length; i++) {
+      this.doRenderGraphFromFile(json[i].csvFile, i);
     }
+  }
+
+  async doRenderGraphFromFile(filename, i) {
+    const url = "api/SampleData/WeatherForecasts?filename="+filename;
+    const d = await fetch(url);
+    const data = await d.json();
+    const filecontent = renderGraph(data, filename);
+    const st = this.state.filecontent;
+    st[i] = filecontent;
+    this.setState({filecontent: st});
+  }
 
   render() {
-    return (
-      <div>{this.state.filecontent}</div>
-    )
+    if (this.state.filecontent === null) {
+      return (
+        <div>Loading data...</div>
+      )
+    } else {
+      return (
+        <table className='table'>
+        <tbody>
+          {this.state.filecontent.map((forecast, index) =>
+            <tr key={index}>
+              <td>{forecast}</td>
+            </tr>
+          )}
+          </tbody>
+        </table>
+      )
+    }
   }
 }
 
@@ -46,7 +64,7 @@ function renderGraph(forecasts, filename) {
       data={[
         {type: 'scatter', line: {shape: 'spline'}, x: createDates(forecasts), y: createTemps(forecasts)},
       ]}
-      layout={ {width: 500, height: 300, title: filename} }
+      layout={ {height: 400, title: filename} }
     />
   );
 }
