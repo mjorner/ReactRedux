@@ -16,15 +16,15 @@ class Home extends Component {
     .then(results => {return results.json();})
     .then(async data => {
       const allGraphs = data.map(async file => {
-        return await this.doReadFile(file.outFile);
+        return await this.doReadFile(file.outFile, file.title);
       })
       const all = await Promise.all(allGraphs);
       this.setState({filecontent: all});
     });
   }
 
-  async doReadFile(filename) {
-    const url = "api/SampleData/ReadFile?filename="+filename;
+  async doReadFile(filename, title) {
+    const url = "api/SampleData/ReadFile?filename="+filename+"&title="+title;
     const d = await fetch(url);
     const data = await d.json();
     return data;
@@ -50,14 +50,14 @@ function renderForecastsTable(props) {
     <table className='table'>
       <thead>
         <tr>
-          <th>File</th>
+          <th>Name</th>
           <th>Read</th>
         </tr>
       </thead>
       <tbody>
         {props.map(forecast =>
-          <tr key={forecast.filename}>
-            <td>{forecast.filename}</td>
+          <tr key={forecast.title}>
+            <td>{forecast.title}</td>
             <td>{forecast.str}</td>
           </tr>
         )}

@@ -13,17 +13,17 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public IEnumerable<ReadingFilenames> GetFilenames() {
             List<ReadingFilenames> list = new List<ReadingFilenames>();
-            list.Add(new ReadingFilenames() { OutFile = "attictemp.out", CsvFile = "attictemp.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "edithtemp.out", CsvFile = "edithtemp.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "ellietemp.out", CsvFile = "ellietemp.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "freezer.out", CsvFile = "freezer.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "fridge.out", CsvFile = "fridge.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "garagetemp.out", CsvFile = "garagetemp.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidelightlux.out", CsvFile = "outsidelightlux.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "outsideroom.out", CsvFile = "outsideroom.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidetemp2.out", CsvFile = "outsidetemp2.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidetemp.out", CsvFile = "outsidetemp.csv" });
-            list.Add(new ReadingFilenames() { OutFile = "pooltemp.out", CsvFile = "pooltemp.csv" });
+            list.Add(new ReadingFilenames() { OutFile = "attictemp.out", CsvFile = "attictemp.csv", Title = "Attic" });
+            list.Add(new ReadingFilenames() { OutFile = "edithtemp.out", CsvFile = "edithtemp.csv", Title = "Edith" });
+            list.Add(new ReadingFilenames() { OutFile = "ellietemp.out", CsvFile = "ellietemp.csv", Title = "Ellie" });
+            list.Add(new ReadingFilenames() { OutFile = "freezer.out", CsvFile = "freezer.csv", Title = "Freezer" });
+            list.Add(new ReadingFilenames() { OutFile = "fridge.out", CsvFile = "fridge.csv", Title = "Fridge" });
+            list.Add(new ReadingFilenames() { OutFile = "garagetemp.out", CsvFile = "garagetemp.csv", Title = "Garage" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidelightlux.out", CsvFile = "outsidelightlux.csv", Title = "Outside lux" });
+            list.Add(new ReadingFilenames() { OutFile = "outsideroom.out", CsvFile = "outsideroom.csv", Title = "Conservatory" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidetemp2.out", CsvFile = "outsidetemp2.csv", Title = "Outside 2" });
+            list.Add(new ReadingFilenames() { OutFile = "outsidetemp.out", CsvFile = "outsidetemp.csv", Title = "Outside 1" });
+            list.Add(new ReadingFilenames() { OutFile = "pooltemp.out", CsvFile = "pooltemp.csv", Title = "Pool" });
             return list;
         }
 
@@ -58,7 +58,7 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public OutResult ReadFile(string filename) {
+        public OutResult ReadFile(string filename, string title) {
             string line = "";
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
@@ -68,7 +68,7 @@ namespace ReactRedux.Controllers {
             } catch (Exception ex) {
                 Console.WriteLine(ex);
             }
-            return new OutResult() { Str = line, Filename = filename };
+            return new OutResult() { Str = line, Title = title };
         }
 
         private static bool IsApproximatelyEqualTo(double initialValue, double value) {
@@ -77,7 +77,7 @@ namespace ReactRedux.Controllers {
 
         public class OutResult {
             public string Str { get; set; }
-            public string Filename { get; set; }
+            public string Title { get; set; }
         }
 
         public class TempReading {
@@ -88,6 +88,7 @@ namespace ReactRedux.Controllers {
         public class ReadingFilenames {
             public string OutFile { get; set; }
             public string CsvFile { get; set; }
+            public string Title {get; set;}
         }
     }
 }

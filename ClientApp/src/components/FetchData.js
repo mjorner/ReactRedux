@@ -23,15 +23,15 @@ class FetchData extends Component {
     this.setState({filecontent: arr});
 
     for (i = 0; i < json.length; i++) {
-      this.doRenderGraphFromFile(json[i].csvFile, i);
+      this.doRenderGraphFromFile(json[i].csvFile, json[i].title, i);
     }
   }
 
-  async doRenderGraphFromFile(filename, i) {
+  async doRenderGraphFromFile(filename, title, i) {
     const url = "api/SampleData/WeatherForecasts?filename="+filename;
     const d = await fetch(url);
     const data = await d.json();
-    const filecontent = renderGraph(data, filename);
+    const filecontent = renderGraph(data, title);
     const st = this.state.filecontent;
     st[i] = filecontent;
     this.setState({filecontent: st});
