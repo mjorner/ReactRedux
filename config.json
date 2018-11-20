@@ -1,0 +1,11 @@
+[{"OutFile":"attictemp.out","CsvFile":"attictemp.csv","Title":"Attic"},
+{"OutFile":"edithtemp.out","CsvFile":"edithtemp.csv","Title":"Edith"},
+{"OutFile":"ellietemp.out","CsvFile":"ellietemp.csv","Title":"Ellie"},
+{"OutFile":"freezer.out","CsvFile":"freezer.csv","Title":"Freezer"},
+{"OutFile":"fridge.out","CsvFile":"fridge.csv","Title":"Fridge"},
+{"OutFile":"garagetemp.out","CsvFile":"garagetemp.csv","Title":"Garage"},
+{"OutFile":"outsidelightlux.out","CsvFile":"outsidelightlux.csv","Title":"Outside lux"},
+{"OutFile":"outsideroom.out","CsvFile":"outsideroom.csv","Title":"Conservatory"},
+{"OutFile":"outsidetemp2.out","CsvFile":"outsidetemp2.csv","Title":"Outside 2"},
+{"OutFile":"outsidetemp.out","CsvFile":"outsidetemp.csv","Title":"Outside 1"},
+{"OutFile":"pooltemp.out","CsvFile":"pooltemp.csv","Title":"Pool"}]

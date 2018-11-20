@@ -11,27 +11,27 @@ using Snappy;
 
 namespace ReactRedux.Controllers {
     [Route("api/[controller]")]
-    public class SampleDataController : Controller {
+    public class DataController : Controller {
 
         [HttpGet("[action]")]
         public IEnumerable<ReadingFilenames> GetFilenames() {
-            List<ReadingFilenames> list = new List<ReadingFilenames>();
-            list.Add(new ReadingFilenames() { OutFile = "attictemp.out", CsvFile = "attictemp.csv", Title = "Attic" });
-            list.Add(new ReadingFilenames() { OutFile = "edithtemp.out", CsvFile = "edithtemp.csv", Title = "Edith" });
-            list.Add(new ReadingFilenames() { OutFile = "ellietemp.out", CsvFile = "ellietemp.csv", Title = "Ellie" });
-            list.Add(new ReadingFilenames() { OutFile = "freezer.out", CsvFile = "freezer.csv", Title = "Freezer" });
-            list.Add(new ReadingFilenames() { OutFile = "fridge.out", CsvFile = "fridge.csv", Title = "Fridge" });
-            list.Add(new ReadingFilenames() { OutFile = "garagetemp.out", CsvFile = "garagetemp.csv", Title = "Garage" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidelightlux.out", CsvFile = "outsidelightlux.csv", Title = "Outside lux" });
-            list.Add(new ReadingFilenames() { OutFile = "outsideroom.out", CsvFile = "outsideroom.csv", Title = "Conservatory" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidetemp2.out", CsvFile = "outsidetemp2.csv", Title = "Outside 2" });
-            list.Add(new ReadingFilenames() { OutFile = "outsidetemp.out", CsvFile = "outsidetemp.csv", Title = "Outside 1" });
-            list.Add(new ReadingFilenames() { OutFile = "pooltemp.out", CsvFile = "pooltemp.csv", Title = "Pool" });
-            return list;
+            string content = "";
+            try {
+                using(var reader = new StreamReader("config.json")) {
+                    while (!reader.EndOfStream) {
+                        content += reader.ReadLine();
+                    }
+                }
+                List<ReadingFilenames> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReadingFilenames>>(content);
+                return list;
+            } catch (Exception ex) {
+                Console.WriteLine(ex);
+                return new List<ReadingFilenames>();
+            }
         }
 
         [HttpGet("[action]")]
-        public CopmpressedData WeatherForecasts(string filename) {
+        public CopmpressedData ReadGraphData(string filename) {
             List<TempReading> list = new List<TempReading>();
             double prevRead = 0;
             try {
@@ -61,11 +61,12 @@ namespace ReactRedux.Controllers {
             byte[] array = Encoding.UTF8.GetBytes(json);
             var compressed = SnappyCodec.Compress(array);
             var inputLength = array.Length;
-            return new CopmpressedData() { Bytes = BitConverter.ToString(compressed), OrigLen = inputLength };
+            string str = Convert.ToBase64String(compressed,0, compressed.Length, Base64FormattingOptions.None);
+            return new CopmpressedData() { Bytes = str, OrigLen = inputLength };
         }
 
         [HttpGet("[action]")]
-        public OutResult ReadFile(string filename, string title) {
+        public OutResult ReadOutFile(string filename, string title) {
             string line = "";
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {

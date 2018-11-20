@@ -11,7 +11,7 @@ class Home extends Component {
   }
 
   async componentDidMount() {
-    const url = "api/SampleData/GetFilenames"
+    const url = "api/Data/GetFilenames"
     fetch(url)
     .then(results => {return results.json();})
     .then(async data => {
@@ -24,7 +24,7 @@ class Home extends Component {
   }
 
   async doReadFile(filename, title) {
-    const url = "api/SampleData/ReadFile?filename="+filename+"&title="+title;
+    const url = "api/Data/ReadOutFile?filename="+filename+"&title="+title;
     const d = await fetch(url);
     const data = await d.json();
     return data;
@@ -38,14 +38,14 @@ class Home extends Component {
     } else {
       return (
         <div>
-          {renderForecastsTable(this.state.filecontent)}
+          {renderTable(this.state.filecontent)}
         </div>
       )
     }
   }
 }
 
-function renderForecastsTable(props) {
+function renderTable(props) {
   return (
     <table className='table'>
       <thead>
@@ -55,10 +55,10 @@ function renderForecastsTable(props) {
         </tr>
       </thead>
       <tbody>
-        {props.map(forecast =>
-          <tr key={forecast.title}>
-            <td>{forecast.title}</td>
-            <td>{forecast.str}</td>
+        {props.map(entity =>
+          <tr key={entity.title}>
+            <td>{entity.title}</td>
+            <td>{entity.str}</td>
           </tr>
         )}
       </tbody>

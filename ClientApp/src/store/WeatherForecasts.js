@@ -11,7 +11,7 @@ export const actionCreators = {
 
     dispatch({ type: requestWeatherForecastsType, filename });
 
-    const url = `api/SampleData/WeatherForecasts?filename=${filename}`;
+    const url = `api/Data/ReadGraphData?filename=${filename}`;
     const response = await fetch(url);
     const forecasts = await response.json();
 
