@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Snappy;
 
 namespace ReactRedux.Controllers {
     [Route("api/[controller]")]
@@ -28,7 +31,7 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<TempReading> WeatherForecasts(string filename) {
+        public CopmpressedData WeatherForecasts(string filename) {
             List<TempReading> list = new List<TempReading>();
             double prevRead = 0;
             try {
@@ -54,7 +57,11 @@ namespace ReactRedux.Controllers {
             } catch (Exception ex) {
                 Console.WriteLine(ex);
             }
-            return list;
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
+            byte[] array = Encoding.UTF8.GetBytes(json);
+            var compressed = SnappyCodec.Compress(array);
+            var inputLength = array.Length;
+            return new CopmpressedData() { Bytes = BitConverter.ToString(compressed), OrigLen = inputLength };
         }
 
         [HttpGet("[action]")]
@@ -75,6 +82,11 @@ namespace ReactRedux.Controllers {
             return (Math.Abs(initialValue - value) < 0.00001);
         }
 
+        public class CopmpressedData {
+            public string Bytes { get; set; }
+            public int OrigLen { get; set; }
+        }
+
         public class OutResult {
             public string Str { get; set; }
             public string Title { get; set; }
@@ -88,7 +100,7 @@ namespace ReactRedux.Controllers {
         public class ReadingFilenames {
             public string OutFile { get; set; }
             public string CsvFile { get; set; }
-            public string Title {get; set;}
+            public string Title { get; set; }
         }
     }
 }

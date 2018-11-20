@@ -31,10 +31,32 @@ class FetchData extends Component {
     const url = "api/SampleData/WeatherForecasts?filename="+filename;
     const d = await fetch(url);
     const data = await d.json();
-    const filecontent = renderGraph(data, title);
+    
+    var SnappyJS = require('snappyjs');
+    var arr = this.createArray(data.bytes);
+    var output = this.bin2String(SnappyJS.uncompress(arr));
+    const filecontent = renderGraph(JSON.parse(output), title);
     const st = this.state.filecontent;
     st[i] = filecontent;
     this.setState({filecontent: st});
+  }
+
+  bin2String(array) {
+    var result = "";
+    for (var i = 0; i < array.length; i++) {
+      result += String.fromCharCode(array[i]);
+    }
+    return result;
+  }
+
+  createArray(str) {
+    var index;
+    var parts = str.split('-');
+    var xx = new Uint8Array(parts.length);
+    for (index = 0; index < parts.length; ++index) {
+      xx[index] = parseInt(parts[index], 16);
+    }
+    return xx;
   }
 
   render() {
@@ -73,7 +95,7 @@ function createDates(forecasts) {
   var index;
   var dates = [];
   for (index = 0; index < forecasts.length; ++index) {
-    var d = forecasts[index].dateTime
+    var d = forecasts[index].DateTime
     dates.push(new Date(d));
   }
   return dates;
@@ -83,7 +105,7 @@ function createTemps(forecasts) {
   var index;
   var temps = [];
   for (index = 0; index < forecasts.length; ++index) {
-    temps.push(forecasts[index].temperatureC);
+    temps.push(forecasts[index].TemperatureC);
   }
   return temps;
 }
