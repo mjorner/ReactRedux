@@ -67,6 +67,5 @@ function renderTable(props) {
 }
 
 export default connect(
-  state => state.home,
   dispatch => bindActionCreators(actionCreators, dispatch)
 )(Home);

@@ -43,8 +43,8 @@ namespace ReactRedux.Controllers {
                         reading.DateTime = parts[0];
                         double d;
                         if (double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
-                            reading.TemperatureC = d;
                             if (!IsApproximatelyEqualTo(prevRead, d)) {
+                                reading.TemperatureC = d;
                                 list.Add(reading);
                                 prevRead = d;
                             }
@@ -61,7 +61,7 @@ namespace ReactRedux.Controllers {
             byte[] array = Encoding.UTF8.GetBytes(json);
             var compressed = SnappyCodec.Compress(array);
             var inputLength = array.Length;
-            string str = Convert.ToBase64String(compressed,0, compressed.Length, Base64FormattingOptions.None);
+            string str = Convert.ToBase64String(compressed, 0, compressed.Length, Base64FormattingOptions.None);
             return new CopmpressedData() { Bytes = str, OrigLen = inputLength };
         }
 
@@ -70,7 +70,9 @@ namespace ReactRedux.Controllers {
             string line = "";
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
-                    line = reader.ReadLine();
+                    while (!reader.EndOfStream) {
+                        line += reader.ReadLine();
+                    }
                     reader.Close();
                 }
             } catch (Exception ex) {
@@ -79,8 +81,28 @@ namespace ReactRedux.Controllers {
             return new OutResult() { Str = line, Title = title };
         }
 
+        [HttpGet("[action]")]
+        public Txt ReadTextFile(string filename) {
+            string line = "";
+            try {
+                using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
+                    while (!reader.EndOfStream) {
+                        line += reader.ReadLine() +"\n";
+                    }
+                    reader.Close();
+                }
+            } catch (Exception ex) {
+                Console.WriteLine(ex);
+            }
+            return new Txt() { Text = line };
+        }
+
         private static bool IsApproximatelyEqualTo(double initialValue, double value) {
             return (Math.Abs(initialValue - value) < 0.00001);
+        }
+
+        public class Txt {
+            public string Text { get; set; }
         }
 
         public class CopmpressedData {
