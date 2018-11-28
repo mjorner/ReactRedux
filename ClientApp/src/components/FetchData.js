@@ -29,11 +29,11 @@ class FetchData extends Component {
 
   async doRenderGraphFromFile(filename, title, i) {
     const url = "api/Data/ReadGraphData?filename=" + filename;
-    const d = await fetch(url);
-    const data = await d.json();
+    const data = await fetch(url);
+    const json = await data.json();
     var SnappyJS = require('snappyjs');
-    var buffer = Uint8Array.from(atob(data.bytes), c => c.charCodeAt(0))
-    var output = this.bin2String(SnappyJS.uncompress(buffer));
+    const buffer = Uint8Array.from(atob(json.base64Bytes), c => c.charCodeAt(0))
+    const output = this.bin2String(SnappyJS.uncompress(buffer));
     const filecontent = this.renderGraph(JSON.parse(output), title);
     const st = this.state.filecontent;
     st[i] = filecontent;

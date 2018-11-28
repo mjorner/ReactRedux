@@ -12,25 +12,14 @@ class Stats extends Component {
         fetch(url)
             .then(results => { return results.json(); })
             .then(data => {
-                const lines = data.text.split('\n');
-                var i;
-                var joined = ""
-                for (i = 0; i < lines.length; i++) {
-                    if (i === lines.length - 1) {
-                        joined += lines[i];
-                    }
-                    else {
-                        joined += lines[i] + '\n';
-                    }
-                }
-                this.setState({ filecontent: joined });
+                this.setState({ filecontent: data.text });
             });
     }
 
     render() {
         if (this.state.filecontent === null) {
             return (
-                <code>Loading data...</code>
+                <pre>Loading data...</pre>
             )
         } else {
             return (

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using ReactRedux.Dtos;
 using Snappy;
 
 namespace ReactRedux.Controllers {
@@ -14,7 +15,7 @@ namespace ReactRedux.Controllers {
     public class DataController : Controller {
 
         [HttpGet("[action]")]
-        public IEnumerable<ReadingFilenames> GetFilenames() {
+        public IEnumerable<ReadingFilenamesDto> GetFilenames() {
             string content = "";
             try {
                 using(var reader = new StreamReader("config.json")) {
@@ -22,24 +23,24 @@ namespace ReactRedux.Controllers {
                         content += reader.ReadLine();
                     }
                 }
-                List<ReadingFilenames> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReadingFilenames>>(content);
+                List<ReadingFilenamesDto> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
                 return list;
             } catch (Exception ex) {
                 Console.WriteLine(ex);
-                return new List<ReadingFilenames>();
+                return new List<ReadingFilenamesDto>();
             }
         }
 
         [HttpGet("[action]")]
-        public CopmpressedData ReadGraphData(string filename) {
-            List<TempReading> list = new List<TempReading>();
+        public CopmpressedDataDto ReadGraphData(string filename) {
+            List<TempReadingDto> list = new List<TempReadingDto>();
             double prevRead = 0;
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
                     while (!reader.EndOfStream) {
                         string line = reader.ReadLine();
                         string[] parts = line.Split(";").ToArray();
-                        TempReading reading = new TempReading();
+                        TempReadingDto reading = new TempReadingDto();
                         reading.DateTime = parts[0];
                         double d;
                         if (double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
@@ -62,11 +63,11 @@ namespace ReactRedux.Controllers {
             var compressed = SnappyCodec.Compress(array);
             var inputLength = array.Length;
             string str = Convert.ToBase64String(compressed, 0, compressed.Length, Base64FormattingOptions.None);
-            return new CopmpressedData() { Bytes = str, OrigLen = inputLength };
+            return new CopmpressedDataDto() { Base64Bytes = str, OrigLen = inputLength };
         }
 
         [HttpGet("[action]")]
-        public OutResult ReadOutFile(string filename, string title) {
+        public OutResultDto ReadOutFile(string filename, string title) {
             string line = "";
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
@@ -78,52 +79,27 @@ namespace ReactRedux.Controllers {
             } catch (Exception ex) {
                 Console.WriteLine(ex);
             }
-            return new OutResult() { Str = line, Title = title };
+            return new OutResultDto() { Str = line, Title = title };
         }
 
         [HttpGet("[action]")]
-        public Txt ReadTextFile(string filename) {
+        public TxtDto ReadTextFile(string filename) {
             string line = "";
             try {
                 using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
                     while (!reader.EndOfStream) {
-                        line += reader.ReadLine() +"\n";
+                        line += reader.ReadLine() + "\n";
                     }
                     reader.Close();
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex);
             }
-            return new Txt() { Text = line };
+            return new TxtDto() { Text = line };
         }
 
         private static bool IsApproximatelyEqualTo(double initialValue, double value) {
             return (Math.Abs(initialValue - value) < 0.00001);
-        }
-
-        public class Txt {
-            public string Text { get; set; }
-        }
-
-        public class CopmpressedData {
-            public string Bytes { get; set; }
-            public int OrigLen { get; set; }
-        }
-
-        public class OutResult {
-            public string Str { get; set; }
-            public string Title { get; set; }
-        }
-
-        public class TempReading {
-            public string DateTime { get; set; }
-            public double TemperatureC { get; set; }
-        }
-
-        public class ReadingFilenames {
-            public string OutFile { get; set; }
-            public string CsvFile { get; set; }
-            public string Title { get; set; }
         }
     }
 }
