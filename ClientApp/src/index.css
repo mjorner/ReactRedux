@@ -3,4 +3,8 @@
     body {
         padding-top: 50px;
     }
+    
+    pre {
+        padding: 0px
+    }
 }

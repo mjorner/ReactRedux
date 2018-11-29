@@ -54,7 +54,13 @@ class FetchData extends Component {
         data={[
           { type: 'scatter', line: { shape: 'spline' }, x: this.createDates(data), y: this.createTemps(data) },
         ]}
-        layout={{ dragmode: 'turntable', height: 400, title: filename }}
+        layout={{ dragmode: 'turntable', height: 300, width: 500, autosize: false, margin: {
+          l: 20,
+          r: 0,
+          b: 50,
+          t: 80,
+          pad: 4
+        }, title: filename }}
       />
     );
   }
