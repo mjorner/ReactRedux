@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import './Stats.css';
 
 class Stats extends Component {
     constructor(props) {

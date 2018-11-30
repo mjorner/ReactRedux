@@ -23,9 +23,9 @@ namespace ReactRedux {
             .ConfigureLogging(factory => {
                 factory.ClearProviders();
                 factory.AddConsole();
-                //factory.AddDebug();
-                factory.AddFilter("Console", level => level >= LogLevel.Information);
-                //'factory.AddFilter("Debug", level => level >= LogLevel.Information);
+                factory.AddDebug();
+                //factory.AddFilter("Console", level => level >= LogLevel.Information);
+                //factory.AddFilter("Debug", level => level >= LogLevel.Information);
             })
             .UseUrls("http://0.0.0.0:4000");
     }
