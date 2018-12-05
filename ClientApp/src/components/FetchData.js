@@ -5,27 +5,70 @@ import { actionCreators } from '../store/WeatherForecasts';
 import Plot from 'react-plotly.js';
 import './FetchData.css';
 import no_graph from '../../src/no_graph.png'
+import Dropdown from 'react-dropdown'
+import 'react-dropdown/style.css'
 
 class FetchData extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { filecontent: null };
+    this.state = { all_json: null, filecontent: null, dropdown_options: null, selected: null };
+    this.onSelect = this.onSelect.bind(this)
   }
 
   async componentDidMount() {
     const url = "api/Data/GetFilenames"
     const data = await fetch(url);
     const json = await data.json();
-    var i;
+    const set = new Set();
+    for (var i = 0; i < json.length; i++) {
+      this.setTypes(set, json[i].type)
+    }
+    var dropdown_values = Array.from(set);
+    this.setState({all_json: json, dropdown_options: dropdown_values, selected: dropdown_values[0] });
+
+    this.displayGraphs(json, dropdown_values[0]);
+  }
+
+  isCorrectType(json, type) {
+    const t = json.type.split(',');
+    for (var i = 0; i < t.length; i++) {
+      if (t[i] === type) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  displayGraphs(all_json, type) {
+    const json = all_json.filter(x=> this.isCorrectType(x, type))
     var arr = [];
-    for (i = 0; i < json.length; i++) {
+    for (var i = 0; i < json.length; i++) {
       arr.push(this.no_graph());
     }
-    this.setState({ filecontent: arr });
+    this.setState({ filecontent: arr});
+    for (var i = 0; i < json.length; i++) {
+      this.doRenderGraphFromFile(json[i].csvFile, json[i].title, i, this.getTypeFileIndex(type));
+    }
+  }
 
-    for (i = 0; i < json.length; i++) {
-      this.doRenderGraphFromFile(json[i].csvFile, json[i].title, i);
+  getTypeFileIndex(type) {
+    if (type === "TEMP") {
+      return 1;
+    }
+    else if (type === "HUM") {
+      return 2;
+    }
+    else if (type === "PRES") {
+      return 3;
+    }
+    return 1;
+  }
+
+  setTypes(set, types) {
+    const t = types.split(',');
+    for (var i = 0; i < t.length; i++) {
+      set.add(t[i]);
     }
   }
 
@@ -35,8 +78,8 @@ class FetchData extends Component {
     )
   }
 
-  async doRenderGraphFromFile(filename, title, i) {
-    const url = "api/Data/ReadGraphData?filename=" + filename;
+  async doRenderGraphFromFile(filename, title, i, columnIndex) {
+    const url = "api/Data/ReadGraphData?filename=" + filename + "&columnIndex=" + columnIndex;
     const data = await fetch(url);
     const json = await data.json();
     var SnappyJS = require('snappyjs');
@@ -106,9 +149,14 @@ class FetchData extends Component {
     var index;
     var temps = [];
     for (index = 0; index < data.length; ++index) {
-      temps.push(data[index].TemperatureC);
+      temps.push(data[index].Value);
     }
     return temps;
+  }
+
+  onSelect(option) {
+    this.displayGraphs(this.state.all_json, option.value);
+    this.setState({selected: option.value});
   }
 
   render() {
@@ -118,6 +166,10 @@ class FetchData extends Component {
       )
     } else {
       return (
+        <div>
+          <div className="drop_d">
+            <Dropdown options={this.state.dropdown_options} onChange={this.onSelect} value={this.state.selected} placeholder="Select an option" />
+          </div>
         <table>
           <tbody>
             {this.state.filecontent.map((graph, index) =>
@@ -127,6 +179,7 @@ class FetchData extends Component {
             )}
           </tbody>
         </table>
+        </div>
       )
     }
   }

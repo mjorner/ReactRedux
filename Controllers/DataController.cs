@@ -37,20 +37,20 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public CopmpressedDataDto ReadGraphData(string filename) {
-            List<TempReadingDto> list = new List<TempReadingDto>();
+        public CopmpressedDataDto ReadGraphData(string filename, int columnIndex) {
+            List<ValueReadingDto> list = new List<ValueReadingDto>();
             double prevRead = 0;
             try {
                 using(var reader = new StreamReader($"{Configuration.DataPath}{filename}")) {
                     while (!reader.EndOfStream) {
                         string line = reader.ReadLine();
                         string[] parts = line.Split(";").ToArray();
-                        TempReadingDto reading = new TempReadingDto();
+                        ValueReadingDto reading = new ValueReadingDto();
                         reading.DateTime = parts[0];
                         double d;
-                        if (double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
+                        if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
                             if (!IsApproximatelyEqualTo(prevRead, d)) {
-                                reading.TemperatureC = d;
+                                reading.Value = d;
                                 list.Add(reading);
                                 prevRead = d;
                             }
