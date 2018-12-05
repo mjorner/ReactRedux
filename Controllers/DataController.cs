@@ -13,6 +13,11 @@ using Snappy;
 namespace ReactRedux.Controllers {
     [Route("api/[controller]")]
     public class DataController : Controller {
+        private readonly AppConfiguration Configuration;
+
+        public DataController(AppConfiguration configuration) {
+            Configuration = configuration;
+        }
 
         [HttpGet("[action]")]
         public IEnumerable<ReadingFilenamesDto> GetFilenames() {
@@ -36,7 +41,7 @@ namespace ReactRedux.Controllers {
             List<TempReadingDto> list = new List<TempReadingDto>();
             double prevRead = 0;
             try {
-                using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
+                using(var reader = new StreamReader($"{Configuration.DataPath}{filename}")) {
                     while (!reader.EndOfStream) {
                         string line = reader.ReadLine();
                         string[] parts = line.Split(";").ToArray();
@@ -70,7 +75,7 @@ namespace ReactRedux.Controllers {
         public OutResultDto ReadOutFile(string filename, string title) {
             string line = "";
             try {
-                using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
+                using(var reader = new StreamReader($"{Configuration.DataPath}{filename}")) {
                     while (!reader.EndOfStream) {
                         line += reader.ReadLine();
                     }
@@ -86,7 +91,7 @@ namespace ReactRedux.Controllers {
         public TxtDto ReadTextFile(string filename) {
             string line = "";
             try {
-                using(var reader = new StreamReader($"/home/pi/OutRAM/{filename}")) {
+                using(var reader = new StreamReader($"{Configuration.DataPath}{filename}")) {
                     while (!reader.EndOfStream) {
                         line += reader.ReadLine() + "\n";
                     }
