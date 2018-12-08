@@ -11,23 +11,27 @@ class Home extends Component {
   }
 
   async componentDidMount() {
-    const url = "api/Data/GetFilenames"
-    fetch(url)
-    .then(results => {return results.json();})
-    .then(async data => {
-      const allGraphs = data.fileNames.map(async file => {
-        return await this.doReadFile(file.outFile, file.title);
-      })
-      const all = await Promise.all(allGraphs);
-      this.setState({filecontent: all});
-    });
+    const url = "api/Data/GetFilenames";
+    const d = await fetch(url);
+    const json = await d.json();
+    var fc = [];
+    for (var i = 0; i < json.fileNames.length; i++) {
+      fc[i] = new LoadClass(json.fileNames[i].title, "Loading...")
+    }
+    this.setState({filecontent: fc});
+
+    for (i = 0; i < json.fileNames.length; i++) {
+      this.doReadFile(json.fileNames[i].outFile, json.fileNames[i].title, i);
+    }
   }
 
-  async doReadFile(filename, title) {
+  async doReadFile(filename, title, i) {
     const url = "api/Data/ReadOutFile?filename="+filename+"&title="+title;
     const d = await fetch(url);
     const data = await d.json();
-    return data;
+    var st = this.state.filecontent;
+    st[i] = data;
+    this.setState({filecontent: st});
   }
 
   render() {
@@ -42,6 +46,13 @@ class Home extends Component {
         </div>
       )
     }
+  }
+}
+
+class LoadClass {
+  constructor(title, str) {
+    this.title = title;
+    this.str = str;
   }
 }
 
