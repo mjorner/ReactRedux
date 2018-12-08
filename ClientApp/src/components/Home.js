@@ -15,7 +15,7 @@ class Home extends Component {
     fetch(url)
     .then(results => {return results.json();})
     .then(async data => {
-      const allGraphs = data.map(async file => {
+      const allGraphs = data.fileNames.map(async file => {
         return await this.doReadFile(file.outFile, file.title);
       })
       const all = await Promise.all(allGraphs);

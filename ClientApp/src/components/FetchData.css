@@ -3,4 +3,7 @@ table {
     width: 340px;
 }
 
-.drop_d { padding-top: 20px; padding-bottom: 20px; width: 200px;}
+.drop_d {float: left; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; width: 200px;}
+.data_options {float: left; width: 712px; border-color: lightgray; border-width: 1px; border-style: solid; background-color: rgb(243, 245, 250)}
+.table_div {clear:both; width: 712px; border-color: lightgray; border-width: 1px; border-style: solid; background-color: rgb(243, 245, 250)}
+.td_row {padding-left: 5px;}

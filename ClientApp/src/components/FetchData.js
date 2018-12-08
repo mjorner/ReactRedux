@@ -12,22 +12,25 @@ class FetchData extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { all_json: null, filecontent: null, dropdown_options: null, selected: null };
-    this.onSelect = this.onSelect.bind(this)
+    this.state = { all_json: null, filecontent: null, dropdown_options: null, selected: null, timePeriods: null, selected_time: null };
+    this.onSelectType = this.onSelectType.bind(this);
+    this.onSelectTime = this.onSelectTime.bind(this);
   }
 
   async componentDidMount() {
     const url = "api/Data/GetFilenames"
     const data = await fetch(url);
-    const json = await data.json();
+    var json = await data.json();
+    const timePeriods = json.timePeriods;
+    json = json.fileNames;
     const set = new Set();
     for (var i = 0; i < json.length; i++) {
       this.setTypes(set, json[i].type)
     }
     var dropdown_values = Array.from(set);
-    this.setState({all_json: json, dropdown_options: dropdown_values, selected: dropdown_values[0] });
+    this.setState({all_json: json, dropdown_options: dropdown_values, selected: dropdown_values[0], timePeriods: timePeriods, selected_time: timePeriods[0] });
 
-    this.displayGraphs(json, dropdown_values[0]);
+    this.displayGraphs(json, dropdown_values[0], timePeriods[0]);
   }
 
   isCorrectType(json, type) {
@@ -40,15 +43,15 @@ class FetchData extends Component {
     return false;
   }
 
-  displayGraphs(all_json, type) {
+  displayGraphs(all_json, type, timeSpan) {
     const json = all_json.filter(x=> this.isCorrectType(x, type))
     var arr = [];
     for (var i = 0; i < json.length; i++) {
       arr.push(this.no_graph());
     }
     this.setState({ filecontent: arr});
-    for (var i = 0; i < json.length; i++) {
-      this.doRenderGraphFromFile(json[i].csvFile, json[i].title, i, this.getTypeFileIndex(type));
+    for (i = 0; i < json.length; i++) {
+      this.doRenderGraphFromFile(json[i].csvFile, json[i].title, i, this.getTypeFileIndex(type), timeSpan);
     }
   }
 
@@ -78,8 +81,8 @@ class FetchData extends Component {
     )
   }
 
-  async doRenderGraphFromFile(filename, title, i, columnIndex) {
-    const url = "api/Data/ReadGraphData?filename=" + filename + "&columnIndex=" + columnIndex;
+  async doRenderGraphFromFile(filename, title, i, columnIndex, timeSpan) {
+    const url = "api/Data/ReadGraphData?filename=" + filename + "&columnIndex=" + columnIndex + "&timeSpan=" + timeSpan;
     const data = await fetch(url);
     const json = await data.json();
     var SnappyJS = require('snappyjs');
@@ -87,7 +90,7 @@ class FetchData extends Component {
     const output = this.bin2String(SnappyJS.uncompress(buffer));
     const subJson = JSON.parse(output);
     const x = this.createDates(subJson);
-    const y = this.createTemps(subJson);
+    const y = this.createValues(subJson);
     const avgs = this.calculateMovingAvg(y);
     const filecontent = this.renderGraph(x, y, avgs, title);
     const st = this.state.filecontent;
@@ -122,41 +125,44 @@ class FetchData extends Component {
   }
 
   calculateMovingAvg(y) {
-    var temps = [];
+    var values = [];
     for (var i = 0; i < y.length; i++) {
       if (i > 9) {
         var sum = y[i] + y[i-1] + y[i-2] + y[i-3] + y[i-4] + y[i-5] + y[i-6] + y[i-7] + y[i-8] + y[i-9];
-        temps.push(sum/10.0);
+        values.push(sum/10.0);
       }
       else {
-        temps.push(y[i]);
+        values.push(y[i]);
       }
     }
-    return temps;
+    return values;
   }
 
   createDates(data) {
-    var index;
     var dates = [];
-    for (index = 0; index < data.length; ++index) {
+    for (var index = 0; index < data.length; ++index) {
       var d = data[index].DateTime
       dates.push(new Date(d));
     }
     return dates;
   }
 
-  createTemps(data) {
-    var index;
-    var temps = [];
-    for (index = 0; index < data.length; ++index) {
-      temps.push(data[index].Value);
+  createValues(data) {
+    var values = [];
+    for (var index = 0; index < data.length; ++index) {
+      values.push(data[index].Value);
     }
-    return temps;
+    return values;
   }
 
-  onSelect(option) {
-    this.displayGraphs(this.state.all_json, option.value);
+  onSelectType(option) {
+    this.displayGraphs(this.state.all_json, option.value, this.state.selected_time);
     this.setState({selected: option.value});
+  }
+
+  onSelectTime(option) {
+    this.displayGraphs(this.state.all_json, this.state.selected, option.value);
+    this.setState({selected_time: option.value});
   }
 
   render() {
@@ -167,18 +173,25 @@ class FetchData extends Component {
     } else {
       return (
         <div>
-          <div className="drop_d">
-            <Dropdown options={this.state.dropdown_options} onChange={this.onSelect} value={this.state.selected} placeholder="Select an option" />
+          <div className="data_options">
+            <div className="drop_d">
+              <Dropdown options={this.state.dropdown_options} onChange={this.onSelectType} value={this.state.selected} placeholder="Select an option" />
+            </div>
+            <div className="drop_d">
+              <Dropdown options={this.state.timePeriods} onChange={this.onSelectTime} value={this.state.selected_time} placeholder="Select an option" />
+            </div>
           </div>
+        <div className="table_div">
         <table>
           <tbody>
             {this.state.filecontent.map((graph, index) =>
               <tr key={index}>
-                <td>{graph}</td>
+                <td className="td_row">{graph}</td>
               </tr>
             )}
           </tbody>
         </table>
+        </div>
         </div>
       )
     }

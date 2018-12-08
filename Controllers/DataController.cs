@@ -20,7 +20,7 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<ReadingFilenamesDto> GetFilenames() {
+        public InitInfoDto GetFilenames() {
             string content = "";
             try {
                 using(var reader = new StreamReader("config.json")) {
@@ -29,39 +29,67 @@ namespace ReactRedux.Controllers {
                     }
                 }
                 List<ReadingFilenamesDto> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
-                return list;
+                return new InitInfoDto() { FileNames = list, TimePeriods = new List<string>(new [] { "24h", "48h", "7d", "14d" }) };
             } catch (Exception ex) {
                 Console.WriteLine(ex);
-                return new List<ReadingFilenamesDto>();
+                return new InitInfoDto();
             }
         }
 
-        [HttpGet("[action]")]
-        public CopmpressedDataDto ReadGraphData(string filename, int columnIndex) {
-            List<ValueReadingDto> list = new List<ValueReadingDto>();
-            double prevRead = 0;
+        private bool IsDateWithinBoundry(DateTime dt, DateTime first, string timeSpan) {
+            TimeSpan ts = first.Subtract(dt);
+            if (timeSpan == "24h") {
+                return ts.TotalSeconds < (24 * 60 * 60);
+            } else if (timeSpan == "48h") {
+                return ts.TotalSeconds < (2 * 24 * 60 * 60);
+            } else if (timeSpan == "7d") {
+                return ts.TotalSeconds < (7 * 24 * 60 * 60);
+            }
+            return ts.TotalSeconds < (14 * 24 * 60 * 60);
+        }
+
+        private List<string> ReadAllLines(string filename) {
+            List<string> lines = new List<string>();
             try {
                 using(var reader = new StreamReader($"{Configuration.DataPath}{filename}")) {
                     while (!reader.EndOfStream) {
-                        string line = reader.ReadLine();
-                        string[] parts = line.Split(";").ToArray();
-                        ValueReadingDto reading = new ValueReadingDto();
-                        reading.DateTime = parts[0];
-                        double d;
-                        if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
-                            if (!IsApproximatelyEqualTo(prevRead, d)) {
-                                reading.Value = d;
-                                list.Add(reading);
-                                prevRead = d;
-                            }
-                        } else {
-                            Console.WriteLine($"Unable to parse double: {parts[1]}");
-                        }
+                        lines.Add(reader.ReadLine());
                     }
                     reader.Close();
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex);
+            }
+            return lines;
+        }
+
+        [HttpGet("[action]")]
+        public CopmpressedDataDto ReadGraphData(string filename, int columnIndex, string timeSpan) {
+            List<ValueReadingDto> list = new List<ValueReadingDto>();
+            double prevRead = 0;
+            DateTime first = DateTime.MaxValue;
+            List<string> lines = ReadAllLines(filename);
+            lines.Reverse();
+            foreach (string line in lines) {
+                string[] parts = line.Split(";").ToArray();
+                ValueReadingDto reading = new ValueReadingDto();
+                reading.DateTime = parts[0];
+                DateTime dt = DateTime.Parse(reading.DateTime);
+                if (first == DateTime.MaxValue) {
+                    first = dt;
+                }
+                if (IsDateWithinBoundry(dt, first, timeSpan)) {
+                    double d;
+                    if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
+                        if (!IsApproximatelyEqualTo(prevRead, d)) {
+                            reading.Value = d;
+                            list.Add(reading);
+                            prevRead = d;
+                        }
+                    } else {
+                        Console.WriteLine($"Unable to parse double: {parts[1]}");
+                    }
+                } 
             }
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
             byte[] array = Encoding.UTF8.GetBytes(json);
