@@ -62,7 +62,7 @@ function renderTable(props) {
       <thead>
         <tr>
           <th>Name</th>
-          <th>Read</th>
+          <th>Value</th>
         </tr>
       </thead>
       <tbody>

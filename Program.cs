@@ -16,10 +16,10 @@ namespace ReactRedux {
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
+            .ConfigureAppConfiguration((hostingContext, config) => {
                 config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appconfig.json", optional: false, reloadOnChange: true);
+                config.AddJsonFile("appconfig.json", optional : false, reloadOnChange : true);
+                config.AddJsonFile("/home/pi/webauth.json", optional : false, reloadOnChange : true);
             })
             .UseStartup<Startup>()
             .UseKestrel(options => {

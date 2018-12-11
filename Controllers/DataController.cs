@@ -19,6 +19,8 @@ namespace ReactRedux.Controllers {
             Configuration = configuration;
         }
 
+        //We also need to inject a file reader.
+        //config.json should come from AppConfiguration and Not the file.
         [HttpGet("[action]")]
         public InitInfoDto GetFilenames() {
             string content = "";
@@ -66,7 +68,6 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public CopmpressedDataDto ReadGraphData(string filename, int columnIndex, string timeSpan) {
             List<ValueReadingDto> list = new List<ValueReadingDto>();
-            double prevRead = 0;
             DateTime first = DateTime.MaxValue;
             List<string> lines = ReadAllLines(filename);
             lines.Reverse();
@@ -78,18 +79,15 @@ namespace ReactRedux.Controllers {
                 if (first == DateTime.MaxValue) {
                     first = dt;
                 }
-                if (IsDateWithinBoundry(dt, first, timeSpan)) {
-                    double d;
-                    if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
-                        if (!IsApproximatelyEqualTo(prevRead, d)) {
-                            reading.Value = d;
-                            list.Add(reading);
-                            prevRead = d;
-                        }
-                    } else {
-                        Console.WriteLine($"Unable to parse double: {parts[1]}");
+                double d;
+                if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
+                    reading.Value = d;
+                    if (IsDateWithinBoundry(dt, first, timeSpan)) {
+                        list.Add(reading);
                     }
-                } 
+                } else {
+                    Console.WriteLine($"Unable to parse double: {parts[1]}");
+                }
             }
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
             byte[] array = Encoding.UTF8.GetBytes(json);
@@ -131,8 +129,8 @@ namespace ReactRedux.Controllers {
             return new TxtDto() { Text = line };
         }
 
-        private static bool IsApproximatelyEqualTo(double initialValue, double value) {
+        /* private static bool IsApproximatelyEqualTo(double initialValue, double value) {
             return (Math.Abs(initialValue - value) < 0.00001);
-        }
+        }*/
     }
 }
