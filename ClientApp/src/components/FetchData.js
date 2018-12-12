@@ -7,6 +7,7 @@ import './FetchData.css';
 import no_graph from '../../src/no_graph.png'
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
+import cookie from 'react-cookies'
 
 class FetchData extends Component {
 
@@ -28,9 +29,20 @@ class FetchData extends Component {
       this.setTypes(set, json[i].type)
     }
     var dropdown_values = Array.from(set);
-    this.setState({all_json: json, dropdown_options: dropdown_values, selected: dropdown_values[0], timePeriods: timePeriods, selected_time: timePeriods[0] });
 
-    this.displayGraphs(json, dropdown_values[0], timePeriods[0]);
+    var dev_sel = cookie.load("dev_sel");
+    if (dev_sel == null) {
+      dev_sel = dropdown_values[0];
+    }
+    
+    var time_sel = cookie.load("time_sel");
+    if (time_sel == null) {
+      time_sel = timePeriods[0];
+    }
+
+    this.setState({all_json: json, dropdown_options: dropdown_values, selected: dev_sel, timePeriods: timePeriods, selected_time: time_sel });
+
+    this.displayGraphs(json, dev_sel, time_sel);
   }
 
   isCorrectType(json, type) {
@@ -157,11 +169,13 @@ class FetchData extends Component {
 
   onSelectType(option) {
     this.displayGraphs(this.state.all_json, option.value, this.state.selected_time);
+    cookie.save("dev_sel", option.value, {path: "/"});
     this.setState({selected: option.value});
   }
 
   onSelectTime(option) {
     this.displayGraphs(this.state.all_json, this.state.selected, option.value);
+    cookie.save("time_sel", option.value, {path: "/"});
     this.setState({selected_time: option.value});
   }
 
