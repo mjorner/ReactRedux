@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../store/WeatherForecasts';
 
 class Home extends Component {
 
@@ -49,12 +47,7 @@ class Home extends Component {
   }
 }
 
-class LoadClass {
-  constructor(title, str) {
-    this.title = title;
-    this.str = str;
-  }
-}
+
 
 function renderTable(props) {
   return (
@@ -77,6 +70,12 @@ function renderTable(props) {
   );
 }
 
+class LoadClass {
+  constructor(title, str) {
+    this.title = title;
+    this.str = str;
+  }
+}
+
 export default connect(
-  dispatch => bindActionCreators(actionCreators, dispatch)
 )(Home);

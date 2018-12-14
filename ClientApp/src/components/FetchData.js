@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../store/WeatherForecasts';
 import Plot from 'react-plotly.js';
 import './FetchData.css';
 import no_graph from '../../src/no_graph.png'
@@ -213,6 +211,4 @@ class FetchData extends Component {
 }
 
 export default connect(
-  state => state.weatherForecasts,
-  dispatch => bindActionCreators(actionCreators, dispatch)
 )(FetchData);

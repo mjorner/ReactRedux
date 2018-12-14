@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ReactRedux.Utilities;
 
 namespace ReactRedux {
     public class Startup {
@@ -28,6 +29,8 @@ namespace ReactRedux {
             appConfiguration.Validate();
 
             services.AddSingleton<AppConfiguration>(appConfiguration);
+            services.AddTransient<IFileReader, FileReader>();
+            services.AddTransient<IStringCompressor, SnappyStringCompressor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +42,9 @@ namespace ReactRedux {
                 app.UseHsts();
             }
 
-            app.UseMiddleware<AuthenticationMiddleware>();
+            if (!env.IsDevelopment()) {
+                app.UseMiddleware<AuthenticationMiddleware>();
+            }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
