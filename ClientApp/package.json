@@ -15,7 +15,11 @@
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "snappyjs": "^0.6.0",
+    "plotly.js": "^1.42.5",
+    "react-plotly.js": "^2.2.0",
+    "react-cookies": "^0.1.0"
   },
   "scripts": {
     "start": "rimraf ./build && react-scripts start",
