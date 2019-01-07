@@ -15,6 +15,12 @@ namespace ReactRedux {
         }
 
         public async Task InvokeAsync(HttpContext context) {
+            if (context.Request.Path != null && context.Request.Path.Value.Contains(".stat")) {
+                await Next(context);
+            }
+            if (Configuration.Pw.Length == 0 && Configuration.Uname.Length == 0) {
+                await Next(context);
+            }
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic")) {
                 string encodedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();

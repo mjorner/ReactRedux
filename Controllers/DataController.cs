@@ -63,5 +63,10 @@ namespace ReactRedux.Controllers {
             string line = string.Join("\n", lines);
             return new TxtDto() { Text = line };
         }
+
+        [HttpGet("[action]")]
+        public ConfigurationDto GetAppConfiguration() {
+            return new ConfigurationDto() { AppTitle = Configuration.AppTitle, SnapShotFile = Configuration.SnapShotFile };
+        }
     }
 }

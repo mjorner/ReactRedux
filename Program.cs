@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
+//npm audit fix
+//setx ASPNETCORE_ENVIRONMENT "Development"
+
 namespace ReactRedux {
     public class Program {
         public static void Main(string[] args) {
@@ -17,9 +20,11 @@ namespace ReactRedux {
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingContext, config) => {
-                config.SetBasePath(Directory.GetCurrentDirectory());
+                string currentPath = Directory.GetCurrentDirectory();
+                config.SetBasePath(currentPath);
+                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json"; 
                 config.AddJsonFile("appconfig.json", optional : false, reloadOnChange : true);
-                config.AddJsonFile("/home/pi/webauth.json", optional : false, reloadOnChange : true);
+                config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
             })
             .UseStartup<Startup>()
             .UseKestrel(options => {

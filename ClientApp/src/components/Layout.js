@@ -6,7 +6,7 @@ export default props => (
   <Grid fluid>
     <Row>
       <Col sm={3}>
-        <NavMenu />
+        <NavMenu app_title={props.app_title} snapshot_file_name={props.snapshot_file_name}/>
       </Col>
       <Col sm={9}>
         {props.children}

@@ -6,6 +6,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = { filecontent: null};
+    document.title = this.props.app_title;
   }
 
   async componentDidMount() {
