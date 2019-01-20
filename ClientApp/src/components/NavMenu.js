@@ -37,17 +37,17 @@ export default class NavMenu extends Component {
         </LinkContainer>
         <LinkContainer to={'/fetchdata'}>
           <NavItem>
-            <Glyphicon glyph='th-list' /> Graphs
+            <Glyphicon glyph='picture' /> Graphs
           </NavItem>
         </LinkContainer>
         <LinkContainer to={'/stats'}>
           <NavItem>
-            <Glyphicon glyph='th-list' /> Stats
+            <Glyphicon glyph='stats' /> Stats
           </NavItem>
         </LinkContainer>
         <LinkContainer to={'/syslog'}>
           <NavItem>
-            <Glyphicon glyph='th-list' /> Syslog
+            <Glyphicon glyph='list-alt' /> Syslog
           </NavItem>
         </LinkContainer>
         {this.renderSnapShot(this.props.snapshot_file_name)}
