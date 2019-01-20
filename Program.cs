@@ -22,8 +22,9 @@ namespace ReactRedux {
             .ConfigureAppConfiguration((hostingContext, config) => {
                 string currentPath = Directory.GetCurrentDirectory();
                 config.SetBasePath(currentPath);
-                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json"; 
-                config.AddJsonFile("appconfig.json", optional : false, reloadOnChange : true);
+                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webappconfig.json"; 
+                config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
+                configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json"; 
                 config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
             })
             .UseStartup<Startup>()

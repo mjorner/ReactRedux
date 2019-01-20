@@ -45,6 +45,11 @@ export default class NavMenu extends Component {
             <Glyphicon glyph='th-list' /> Stats
           </NavItem>
         </LinkContainer>
+        <LinkContainer to={'/syslog'}>
+          <NavItem>
+            <Glyphicon glyph='th-list' /> Syslog
+          </NavItem>
+        </LinkContainer>
         {this.renderSnapShot(this.props.snapshot_file_name)}
       </Nav>
     </Navbar.Collapse>

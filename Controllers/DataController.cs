@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ReactRedux.Dtos;
@@ -21,7 +23,9 @@ namespace ReactRedux.Controllers {
 
         [HttpGet("[action]")]
         public InitInfoDto GetFilenames() {
-            List<string> lines = FileReader.ReadAllLines("config.json");
+            string currentPath = Directory.GetCurrentDirectory();
+            string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webconfig.json"; 
+            List<string> lines = FileReader.ReadAllLines(configPath);
             string content = string.Join("", lines);
             List<ReadingFilenamesDto> list = JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
             return new InitInfoDto() { FileNames = list, TimePeriods = TimePeriods.AllTimePeriods };
@@ -67,6 +71,16 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public ConfigurationDto GetAppConfiguration() {
             return new ConfigurationDto() { AppTitle = Configuration.AppTitle, SnapShotFile = Configuration.SnapShotFile };
+        }
+
+        [HttpGet("[action]")]
+        public TxtDto ReadSysLog(string filename) {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                return new TxtDto() {Text = "Not Linux!"};
+            }
+            List<string> lines = FileReader.ReadAllLines("/var/log/syslog");
+            string line = string.Join("\n", lines);
+            return new TxtDto() { Text = line };
         }
     }
 }

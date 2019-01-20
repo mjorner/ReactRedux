@@ -5,6 +5,7 @@ import Home from './components/Home';
 import FetchData from './components/FetchData';
 import Stats from './components/Stats';
 import Snapshot from './components/Snapshot';
+import SysLog from './components/SysLog';
 
 class App extends React.Component {
   constructor(props) {
@@ -41,6 +42,7 @@ class App extends React.Component {
           <Route exact path='/' render={props => <Home {...props} app_title={title} />}/>
           <Route path='/fetchdata' render={props => <FetchData {...props} app_title={title} />}/>
           <Route path='/stats' render={props => <Stats {...props} app_title={title} />}/>
+          <Route path='/syslog' render={props => <SysLog {...props} app_title={title} />}/>
           {this.renderSnapShot(title, snapshot_file_name)}
         </Layout>
       )
