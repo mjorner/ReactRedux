@@ -7,16 +7,16 @@ import './NavMenu.css';
 export default class NavMenu extends Component {
   
   renderSnapShot(snapshot_file_name) {
-    if (snapshot_file_name.length !== 0) {
-      return ( 
-        <LinkContainer to={'/snapshot'}>
-          <NavItem>
-            <Glyphicon glyph='th-list' /> Snapshot
-          </NavItem>
-        </LinkContainer>
-      )
+    if (snapshot_file_name.length === 0) {
+      return null;
     }
-    return null;
+    return ( 
+      <LinkContainer to={'/snapshot'}>
+        <NavItem>
+          <Glyphicon glyph='th-list' /> Snapshot
+        </NavItem>
+      </LinkContainer>
+    )
   }
 
   render() {
