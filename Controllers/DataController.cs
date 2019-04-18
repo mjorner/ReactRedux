@@ -34,6 +34,10 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public CopmpressedDataDto ReadGraphData(string filename, int columnIndex, string timeSpan) {
             List<ValueReadingDto> list = new List<ValueReadingDto>();
+            if (filename == null) {
+                return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(list) };
+            }
+
             DateTime? first = null;
             List<string> lines = FileReader.ReadAllLines($"{Configuration.DataPath}{filename}");
             lines.Reverse();

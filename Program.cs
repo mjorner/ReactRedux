@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 //npm audit fix
 //setx ASPNETCORE_ENVIRONMENT "Development"
-
+//dotnet publish -c Release -r linux-arm
 namespace ReactRedux {
     public class Program {
         public static void Main(string[] args) {
