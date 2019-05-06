@@ -16,14 +16,21 @@ namespace ReactRedux {
         public string SnapShotPath {
             get {
                 string s = Configuration["snap_shot_path"];
-                return s == null? "": s;
+                return s == null ? "" : s;
             }
         }
 
         public string SnapShotFile {
             get {
                 string s = Configuration["snap_shot_file"];
-                return s == null? "": s;
+                return s == null ? "" : s;
+            }
+        }
+
+        public string LogFiles {
+            get { 
+                string s = Configuration["log_files"];
+                return s == null ? "" : s;
             }
         }
 

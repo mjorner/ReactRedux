@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using Snappy;
 
 namespace ReactRedux.Utilities {
@@ -10,6 +11,10 @@ namespace ReactRedux.Utilities {
             var compressed = SnappyCodec.Compress(array);
             string str = Convert.ToBase64String(compressed, 0, compressed.Length, Base64FormattingOptions.None);
             return str;
+        }
+
+        public Task<string> CompressAsync(object obj) {
+            return Task.Run(() => Compress(obj));
         }
     }
 }

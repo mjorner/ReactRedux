@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ReactRedux.Dtos;
@@ -22,24 +23,24 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public InitInfoDto GetFilenames() {
+        public async Task<InitInfoDto> GetFilenames() {
             string currentPath = Directory.GetCurrentDirectory();
             string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webconfig.json"; 
-            List<string> lines = FileReader.ReadAllLines(configPath);
+            List<string> lines = await FileReader.ReadAllLinesAsync(configPath);
             string content = string.Join("", lines);
             List<ReadingFilenamesDto> list = JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
             return new InitInfoDto() { FileNames = list, TimePeriods = TimePeriods.AllTimePeriods };
         }
 
         [HttpGet("[action]")]
-        public CopmpressedDataDto ReadGraphData(string filename, int columnIndex, string timeSpan) {
+        public async Task<CopmpressedDataDto> ReadGraphData(string filename, int columnIndex, string timeSpan) {
             List<ValueReadingDto> list = new List<ValueReadingDto>();
             if (filename == null) {
                 return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(list) };
             }
 
             DateTime? first = null;
-            List<string> lines = FileReader.ReadAllLines($"{Configuration.DataPath}{filename}");
+            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
             lines.Reverse();
             foreach (string line in lines) {
                 ValueReadingDto reading = null;
@@ -54,35 +55,35 @@ namespace ReactRedux.Controllers {
                     list.Add(reading);
                 }
             }
-            string str = StringCompressor.Compress(list);
+            string str = await StringCompressor.CompressAsync(list);
             return new CopmpressedDataDto() { Base64Bytes = str };
         }
 
         [HttpGet("[action]")]
-        public OutResultDto ReadOutFile(string filename, string title) {
-            List<string> lines = FileReader.ReadAllLines($"{Configuration.DataPath}{filename}");
+        public async Task<OutResultDto> ReadOutFile(string filename, string title) {
+            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
             string line = string.Join("", lines);
             return new OutResultDto() { Str = line, Title = title };
         }
 
         [HttpGet("[action]")]
-        public TxtDto ReadTextFile(string filename) {
-            List<string> lines = FileReader.ReadAllLines($"{Configuration.DataPath}{filename}");
+        public async Task<TxtDto> ReadTextFile(string filename) {
+            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
             string line = string.Join("\n", lines);
             return new TxtDto() { Text = line };
         }
 
         [HttpGet("[action]")]
         public ConfigurationDto GetAppConfiguration() {
-            return new ConfigurationDto() { AppTitle = Configuration.AppTitle, SnapShotFile = Configuration.SnapShotFile };
+            return new ConfigurationDto() { AppTitle = Configuration.AppTitle, SnapShotFile = Configuration.SnapShotFile, LogFiles = Configuration.LogFiles };
         }
 
         [HttpGet("[action]")]
-        public TxtDto ReadSysLog(string filename) {
+        public async Task<TxtDto> ReadSysLog(string filename) {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 return new TxtDto() {Text = "Not Linux!"};
             }
-            List<string> lines = FileReader.ReadAllLines("/var/log/syslog");
+            List<string> lines = await FileReader.ReadAllLinesAsync($"/var/log/{filename}");
             string line = string.Join("\n", lines);
             return new TxtDto() { Text = line };
         }

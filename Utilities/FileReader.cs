@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ReactRedux.Utilities {
     internal sealed class FileReader : IFileReader {
@@ -17,6 +18,10 @@ namespace ReactRedux.Utilities {
                 Console.WriteLine(ex);
             }
             return lines;
+        }
+
+        public Task<List<string>> ReadAllLinesAsync(string filePath) {
+            return Task.Run(() => ReadAllLines(filePath));
         }
     }
 }

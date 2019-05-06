@@ -28,6 +28,14 @@ class App extends React.Component {
     }
   }
 
+  renderLogFiles(title, log_files) {
+    if (log_files.length !== 0) {
+      return (
+        <Route path='/syslog' render={props => <SysLog {...props} app_title={title} log_files={log_files} />}/>
+      )
+    }
+  }
+
   render() {  
     if (this.state.app_config === null) {
       return (
@@ -37,12 +45,13 @@ class App extends React.Component {
     else {
       const title = this.state.app_config.appTitle;
       const snapshot_file_name = this.state.app_config.snapShotFile;
+      const log_files = this.state.app_config.logFiles;
       return (
-        <Layout app_title={title} snapshot_file_name={snapshot_file_name}>
+        <Layout app_title={title} snapshot_file_name={snapshot_file_name} log_files={log_files}>
           <Route exact path='/' render={props => <Home {...props} app_title={title} />}/>
           <Route path='/fetchdata' render={props => <FetchData {...props} app_title={title} />}/>
           <Route path='/stats' render={props => <Stats {...props} app_title={title} />}/>
-          <Route path='/syslog' render={props => <SysLog {...props} app_title={title} />}/>
+          {this.renderLogFiles(title, log_files)}
           {this.renderSnapShot(title, snapshot_file_name)}
         </Layout>
       )

@@ -13,9 +13,22 @@ export default class NavMenu extends Component {
     return ( 
       <LinkContainer to={'/snapshot'}>
         <NavItem>
-          <Glyphicon glyph='th-list' /> Snapshot
+          <Glyphicon glyph='picture' /> Snapshot
         </NavItem>
       </LinkContainer>
+    )
+  }
+
+  renderLogFiles(log_files) {
+    if (log_files.length === 0) {
+      return null;
+    }
+    return ( 
+      <LinkContainer to={'/syslog'}>
+          <NavItem>
+            <Glyphicon glyph='list-alt' /> Logs
+          </NavItem>
+        </LinkContainer>
     )
   }
 
@@ -37,7 +50,7 @@ export default class NavMenu extends Component {
         </LinkContainer>
         <LinkContainer to={'/fetchdata'}>
           <NavItem>
-            <Glyphicon glyph='picture' /> Graphs
+            <Glyphicon glyph='equalizer' /> Graphs
           </NavItem>
         </LinkContainer>
         <LinkContainer to={'/stats'}>
@@ -45,11 +58,7 @@ export default class NavMenu extends Component {
             <Glyphicon glyph='stats' /> Stats
           </NavItem>
         </LinkContainer>
-        <LinkContainer to={'/syslog'}>
-          <NavItem>
-            <Glyphicon glyph='list-alt' /> Syslog
-          </NavItem>
-        </LinkContainer>
+        {this.renderLogFiles(this.props.log_files)}
         {this.renderSnapShot(this.props.snapshot_file_name)}
       </Nav>
     </Navbar.Collapse>
