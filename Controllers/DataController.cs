@@ -34,28 +34,13 @@ namespace ReactRedux.Controllers {
 
         [HttpGet("[action]")]
         public async Task<CopmpressedDataDto> ReadGraphData(string filename, int columnIndex, string timeSpan) {
-            List<ValueReadingDto> list = new List<ValueReadingDto>();
             if (filename == null) {
-                return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(list) };
+                return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(new List<ValueReadingDto>()) };
             }
 
-            DateTime? first = null;
             List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
-            lines.Reverse();
-            foreach (string line in lines) {
-                ValueReadingDto reading = null;
-                if (StringParser.TryParseLine(line, columnIndex, out reading)) {
-                    DateTime dt = DateTime.Parse(reading.DateTime);
-                    if (!first.HasValue) {
-                        first = dt;
-                    }
-                    if (!TimePeriods.IsDateWithinBoundry(dt, first.Value, timeSpan)) {
-                        break;
-                    }
-                    list.Add(reading);
-                }
-            }
-            string str = await StringCompressor.CompressAsync(list);
+            List<ValueReadingDto> list = StringParser.ParseValueReadings(lines, columnIndex, timeSpan);
+            string str = StringCompressor.Compress(list);
             return new CopmpressedDataDto() { Base64Bytes = str };
         }
 
@@ -80,10 +65,7 @@ namespace ReactRedux.Controllers {
 
         [HttpGet("[action]")]
         public async Task<TxtDto> ReadSysLog(string filename) {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-                return new TxtDto() {Text = "Not Linux!"};
-            }
-            List<string> lines = await FileReader.ReadAllLinesAsync($"/var/log/{filename}");
+            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.LogPath}{filename}");
             string line = string.Join("\n", lines);
             return new TxtDto() { Text = line };
         }

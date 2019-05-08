@@ -7,9 +7,15 @@ class Home extends Component {
     super(props);
     this.state = { filecontent: null};
     document.title = this.props.app_title;
+    this.reload = this.reload.bind(this);
   }
 
   async componentDidMount() {
+    this.props.setReloadHandler(this.reload);
+    this.reload();
+  }
+
+  async reload() {
     const url = "api/Data/GetFilenames";
     const d = await fetch(url);
     const json = await d.json();

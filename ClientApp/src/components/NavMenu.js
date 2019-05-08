@@ -6,6 +6,10 @@ import './NavMenu.css';
 
 export default class NavMenu extends Component {
   
+  constructor(props) {
+    super(props);
+  }
+
   renderSnapShot(snapshot_file_name) {
     if (snapshot_file_name.length === 0) {
       return null;
@@ -38,6 +42,7 @@ export default class NavMenu extends Component {
     <Navbar.Header>
       <Navbar.Brand>
         <Link to={'/'}>{this.props.app_title}</Link>
+        <button type="button" class="button" onClick={this.props.reload_handler}>RELOAD</button>
       </Navbar.Brand>
       <Navbar.Toggle />
     </Navbar.Header>

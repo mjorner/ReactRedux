@@ -11,9 +11,15 @@ class SysLog extends Component {
         this.state = { filecontent: null, selected: null };
         this.onSelectType = this.onSelectType.bind(this);
         document.title = this.props.app_title;
+        this.reload = this.reload.bind(this);
     }
 
     componentDidMount() {
+        this.props.setReloadHandler(this.reload);
+        this.reload();
+    }
+
+    reload() {
         var dropdown_values = this.props.log_files.split(";");
         var log_sel = cookie.load("log_sel");
         if (log_sel == null) {

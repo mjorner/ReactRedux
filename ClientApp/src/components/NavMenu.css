@@ -2,6 +2,22 @@
     margin-right: 10px;
 }
 
+.button {
+    background-color: #333333;
+    color: rgb(26, 25, 25);
+    border: 1px solid #555555;
+    margin-left: 15px;
+  }
+  
+.button:hover {
+    background-color: #333333;
+    color: black;
+}
+
+.button:focus {
+    outline: 0;
+}
+
 /* Highlighting rules for nav menu items */
 .navbar .navbar-nav .active a,
 .navbar .navbar-nav .active a:hover,

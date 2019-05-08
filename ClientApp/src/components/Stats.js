@@ -7,9 +7,15 @@ class Stats extends Component {
         super(props);
         this.state = { filecontent: null };
         document.title = this.props.app_title;
+        this.reload = this.reload.bind(this);
     }
 
     componentDidMount() {
+        this.props.setReloadHandler(this.reload);
+        this.reload();
+    }
+
+    reload() {
         const url = "api/Data/ReadTextFile?filename=s.stat";
         fetch(url)
             .then(results => { return results.json(); })

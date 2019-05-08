@@ -14,10 +14,16 @@ class FetchData extends Component {
     this.state = { all_json: null, filecontent: null, dropdown_options: null, selected: null, timePeriods: null, selected_time: null };
     this.onSelectType = this.onSelectType.bind(this);
     this.onSelectTime = this.onSelectTime.bind(this);
+    this.reload = this.reload.bind(this);
     document.title = this.props.app_title;
   }
 
   async componentDidMount() {
+    this.props.setReloadHandler(this.reload);
+    this.reload();
+  }
+
+  async reload() {
     const url = "api/Data/GetFilenames"
     const data = await fetch(url);
     var json = await data.json();

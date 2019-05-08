@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ReactRedux.Utilities {
     internal static class TimePeriods {
-        public static List<string> AllTimePeriods => new List<string>(new [] { "24h", "48h", "7d", "14d" });
+        public static IList<string> AllTimePeriods => new List<string>(new [] { "24h", "48h", "7d", "14d" });
 
         public static bool IsDateWithinBoundry(DateTime dt, DateTime first, string timeSpan) {
             TimeSpan ts = first.Subtract(dt);

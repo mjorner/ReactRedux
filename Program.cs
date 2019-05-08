@@ -9,7 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 //npm audit fix
-//setx ASPNETCORE_ENVIRONMENT "Development"
+//setx ASPNETCORE_ENVIRONMENT "Development" windows
+//export ASPNETCORE_ENVIRONMENT="Development" Linux
 //dotnet publish -c Release -r linux-arm
 namespace ReactRedux {
     public class Program {
