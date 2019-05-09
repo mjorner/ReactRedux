@@ -4,18 +4,24 @@
 
 .button {
     background-color: #333333;
-    color: rgb(26, 25, 25);
+    color: gray;
     border: 1px solid #555555;
     margin-left: 15px;
   }
   
 .button:hover {
     background-color: #333333;
-    color: black;
+    color: white;
 }
 
 .button:focus {
     outline: 0;
+    color: grey;
+}
+
+.button:active {
+    background-color: grey;
+    color: white;
 }
 
 /* Highlighting rules for nav menu items */
