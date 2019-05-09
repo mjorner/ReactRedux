@@ -41,8 +41,8 @@ export default class NavMenu extends Component {
       <Navbar inverse fixedTop fluid collapseOnSelect>
     <Navbar.Header>
       <Navbar.Brand>
-        <Link to={'/'}>{this.props.app_title}</Link>
-        <button type="button" class="button" onClick={this.props.reload_handler}>RELOAD</button>
+        <Link className='homeglyph' to={'/'}><Glyphicon glyph='home' /></Link>
+        <button type='button' className='button' onClick={this.props.reload_handler}>{this.props.app_title}</button>
       </Navbar.Brand>
       <Navbar.Toggle />
     </Navbar.Header>
