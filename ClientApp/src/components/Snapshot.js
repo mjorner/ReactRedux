@@ -6,6 +6,21 @@ class Snapshot extends Component {
     constructor(props) {
         super(props);
         document.title = this.props.app_title;
+        this.state = { counter: 1 };
+        this.reload = this.reload.bind(this);
+    }
+
+    componentDidMount() {
+        this.props.setReloadHandler(this.reload);
+    }
+
+    reload() {
+        var counter = this.state.counter;
+        counter++;
+        if (counter > 10) {
+            counter = 1;
+        }
+        this.setState({counter: counter});
     }
 
     render() {

@@ -28,7 +28,7 @@ class App extends React.Component {
   renderSnapShot(title, snapshot_file_name) {
     if (snapshot_file_name.length !== 0) {
       return ( 
-        <Route path='/snapshot' render={props => <Snapshot {...props} app_title={title} snapshot_file_name={snapshot_file_name} />}/>
+        <Route path='/snapshot' render={props => <Snapshot {...props} app_title={title} snapshot_file_name={snapshot_file_name} setReloadHandler={handler => this.reloadChild = handler}/>}/>
       )
     }
   }
