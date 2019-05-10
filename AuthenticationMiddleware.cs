@@ -13,7 +13,6 @@ namespace ReactRedux {
             Next = next;
             Configuration = configuration;
         }
-
         public async Task InvokeAsync(HttpContext context) {
             if (context.Request.Path != null && context.Request.Path.Value.Contains(".stat")) {
                 await Next(context);

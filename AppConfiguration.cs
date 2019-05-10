@@ -5,32 +5,32 @@ using ReactRedux.Dtos;
 
 namespace ReactRedux {
     public sealed class AppConfiguration {
+        private readonly IConfiguration Configuration;
+        public AppConfiguration (IConfiguration configuration) {
+            Configuration = configuration;
+        }
         public string DataPath { get { return Configuration["data_path"]; } }
         public string Uname { get { return Configuration["uname"]; } }
         public string Pw { get { return Configuration["pw"]; } }
         public string AppTitle { get { return Configuration["app_title"]; } }
-
         public string SnapShotPath {
             get {
                 string s = Configuration["snap_shot_path"];
                 return s == null ? "" : s;
             }
         }
-
         public string SnapShotFile {
             get {
                 string s = Configuration["snap_shot_file"];
                 return s == null ? "" : s;
             }
         }
-
         public string LogPath {
             get { 
                 string s = Configuration["log_path"];
                 return s == null ? "" : s;
             }
         }
-
         private string LogFilesRaw {
             get { 
                 string s = Configuration["log_files"];
@@ -49,11 +49,6 @@ namespace ReactRedux {
                 return "";
             }
             return files.Aggregate((current, next) => current + ';' + next);
-        }
-
-        private readonly IConfiguration Configuration;
-        public AppConfiguration (IConfiguration configuration) {
-            Configuration = configuration;
         }
 
         public void Validate () {

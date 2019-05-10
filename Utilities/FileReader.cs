@@ -19,6 +19,7 @@ namespace ReactRedux.Utilities {
             }
             return lines;
         }
+        
         public Task<List<string>> ReadAllLinesAsync(string filePath) {
             return Task.Run(() => ReadAllLines(filePath));
         }
