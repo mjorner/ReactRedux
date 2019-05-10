@@ -191,7 +191,7 @@ class FetchData extends Component {
       )
     } else {
       return (
-        <div>
+        <div className='white'>
           <div className="data_options">
             <div className="drop_d">
               <Dropdown options={this.state.dropdown_options} onChange={this.onSelectType} value={this.state.selected} placeholder="Select an option" />
@@ -200,17 +200,17 @@ class FetchData extends Component {
               <Dropdown options={this.state.timePeriods} onChange={this.onSelectTime} value={this.state.selected_time} placeholder="Select an option" />
             </div>
           </div>
-        <div className="table_div">
-        <table>
-          <tbody>
-            {this.state.filecontent.map((graph, index) =>
-              <tr key={index}>
-                <td className="td_row">{graph}</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        </div>
+          <div className="table_div">
+            <table>
+              <tbody>
+                {this.state.filecontent.map((graph, index) =>
+                  <tr key={index}>
+                    <td className="td_row">{graph}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )
     }
