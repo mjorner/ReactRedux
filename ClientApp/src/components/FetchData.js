@@ -31,7 +31,9 @@ class FetchData extends Component {
     json = json.fileNames;
     const set = new Set();
     for (var i = 0; i < json.length; i++) {
-      this.setTypes(set, json[i].type)
+      if (json[i].csvFile.length > 0) {
+        this.setTypes(set, json[i].type)
+      }
     }
     var dropdown_values = Array.from(set);
 
