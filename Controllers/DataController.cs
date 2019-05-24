@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ReactRedux.Dtos;
 using ReactRedux.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace ReactRedux.Controllers {
     [Route("api/[controller]")]
@@ -16,13 +17,16 @@ namespace ReactRedux.Controllers {
         private readonly IFileReader FileReader;
         private readonly IStringCompressor StringCompressor;
         private readonly IFileReadContainerPool FileReadContainerPool;
+        private readonly ILogger Logger; 
 
         public DataController(AppConfiguration configuration, IFileReader fileReader, 
-                                IStringCompressor stringCompressor, IFileReadContainerPool fileReadContainerPool) {
+                                IStringCompressor stringCompressor, IFileReadContainerPool fileReadContainerPool,
+                                ILogger<DataController> logger) {
             Configuration = configuration;
             FileReader = fileReader;
             StringCompressor = stringCompressor;
             FileReadContainerPool = fileReadContainerPool;
+            Logger = logger;
         }
 
         [HttpGet("[action]")]
@@ -36,13 +40,15 @@ namespace ReactRedux.Controllers {
         }
 
         [HttpGet("[action]")]
-        public async Task<CopmpressedDataDto> ReadGraphData(string filename, int columnIndex, string timeSpan) {
-            if (filename == null) {
+        public async Task<CopmpressedDataDto> ReadGraphData(string fileName, int columnIndex, string timeSpan) {
+            if (fileName == null) {
                 return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(new ValueReadingDto[0]) };
             }
             FileReadContainer fileReadContainer = FileReadContainerPool.Rent();
-            await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}", fileReadContainer);
+            await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{fileName}", fileReadContainer);
+            Logger.LogTrace($"Read {fileReadContainer.CurrentLineCount} for {fileName}.");
             int count = StringParser.ParseValueReadings(fileReadContainer, columnIndex, timeSpan);
+            Logger.LogTrace($"Parsed {count-1} lines for {fileName} with {timeSpan}.");
             string str = StringCompressor.Compress(fileReadContainer.Values.Take(count-1));
             FileReadContainerPool.Return(fileReadContainer);
             return new CopmpressedDataDto() { Base64Bytes = str };

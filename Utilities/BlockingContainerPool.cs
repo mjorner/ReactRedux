@@ -1,10 +1,13 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace ReactRedux.Utilities {
     internal class BlockingContainerPool<T> {
         private readonly BlockingCollection<T> Pool;
-        public BlockingContainerPool() {
+        private readonly ILogger Logger; 
+        public BlockingContainerPool(ILogger logger) {
             Pool = new BlockingCollection<T>();
+            Logger = logger;
         }
 
         public virtual void Return(T item) {
@@ -13,9 +16,13 @@ namespace ReactRedux.Utilities {
 
         public T Rent() {
             T item;
-            while (!Pool.TryTake(out item, 50)) {
-                //This could be logged to signal that our sizing is too small?
-                //If the current thread has e.g. waited more than 2 times!?
+            int count = 0;
+            int timeout = 50;
+            while (!Pool.TryTake(out item, timeout)) {
+                if (count > 10) {
+                    Logger.LogWarning($"Waited more than {count*timeout}ms for {typeof(T)}");
+                }
+                count++;
             }
             return item;
         }

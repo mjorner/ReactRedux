@@ -9,12 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactRedux.Utilities;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace ReactRedux {
     public class Startup {
-        public Startup(IConfiguration configuration) {
+        private readonly ILoggerFactory LoggerFactory;
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) {
             Configuration = configuration;
+            LoggerFactory = loggerFactory;
         }
 
         public IConfiguration Configuration { get; }
@@ -34,7 +37,8 @@ namespace ReactRedux {
             services.AddSingleton<AppConfiguration>(appConfiguration);
             services.AddTransient<IFileReader, FileReader>();
             services.AddTransient<IStringCompressor, SnappyStringCompressor>();
-            services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength));
+            ILogger<BlockingFileReadContainerPool> poolLogger = LoggerFactory.CreateLogger<BlockingFileReadContainerPool>();
+            services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength, poolLogger));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 //setx ASPNETCORE_ENVIRONMENT "Development" windows
 //export ASPNETCORE_ENVIRONMENT="Development" Linux
 //dotnet publish -c Release -r linux-arm
+
+//TODO: use IOptionsMonitor for monitoring changes to configuration.
 namespace ReactRedux {
     public class Program {
         public static void Main(string[] args) {
