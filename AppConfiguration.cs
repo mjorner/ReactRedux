@@ -43,6 +43,39 @@ namespace ReactRedux {
             }
         }
 
+        public int GraphLineLength {
+            get {
+                string s = Configuration["graph_line_length"];
+                int len;
+                if (int.TryParse(s, out len)) {
+                    return len;
+                }
+                return 100;        
+            }
+        }
+
+        public int GraphConcurrencyCount {
+            get {
+                string s = Configuration["graph_concurrency_count"];
+                int len;
+                if (int.TryParse(s, out len)) {
+                    return len;
+                }
+                return 10;        
+            }
+        }
+
+        public int GraphLineCount {
+            get {
+                string s = Configuration["graph_line_count"];
+                int len;
+                if (int.TryParse(s, out len)) {
+                    return len;
+                }
+                return 50000;        
+            }
+        }
+
         private string ValidateAvailableFiles(string allLogFiles) {
             string[] files = allLogFiles.Split(';').Where(x => File.Exists($"{LogPath}{x}")).ToArray();
             if (files.Length == 0) { 

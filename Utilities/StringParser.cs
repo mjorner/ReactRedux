@@ -1,46 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReactRedux.Dtos;
 
 namespace ReactRedux.Utilities {
     internal static class StringParser {
-        private static bool TryParseLine(string line, int columnIndex, out ValueReadingDto reading) {
-            string[] parts = line.Split(";").ToArray();
-            reading = new ValueReadingDto();
-            reading.DateTime = parts[0];
-            DateTime dt = DateTime.Parse(reading.DateTime);
-            double d;
-            if (double.TryParse(parts[columnIndex], NumberStyles.Any, CultureInfo.InvariantCulture, out d)) {
-                reading.Value = d;
-                return true;
-            } else {
-                Console.WriteLine($"Unable to parse double: {parts[1]}");
+        private static bool FindPartLength(char[] line, char separator, int start, out int length) {
+            length = 0;
+            for (int i = start; i < line.Length; i++) {
+                length++;
+                if (line[i] == separator || line[i] == '\n') {
+                    return true;
+                }
             }
             return false;
         }
 
-        public static List<ValueReadingDto> ParseValueReadings(List<string> lines, int columnIndex, string timeSpan) {
-            lines.Reverse(); //Start from the end!
+        private static bool TryParseLine(char[] line, int columnIndex, ValueReadingDto reading) {
+            int length = 0;
+            int start = 0;
+            if (!FindPartLength(line, ';', start, out length)) {
+                return false;
+            }
+            reading.DateTime = new string(new Span<char>(line, 0, length - 1));
+            for (int i = 0; i < columnIndex; i++) {
+                start += length;
+                if (!FindPartLength(line, ';', start, out length)) {
+                    return false;
+                }
+            }
+            double value;
+            if (double.TryParse(new ReadOnlySpan<char>(line, start, length - 1), NumberStyles.Any, CultureInfo.InvariantCulture, out value)) {
+                reading.Value = value;
+                return true;
+            } else {
+                Console.WriteLine($"Unable to parse double: {line}");
+            }
+            return false;
+        }
 
+        public static int ParseValueReadings(FileReadContainer fileReadContainer, int columnIndex, string timeSpan) {
+            int count = 0;
             DateTime? first = null;
-            List<ValueReadingDto> list = new List<ValueReadingDto>();
-            foreach (string line in lines) {
-                ValueReadingDto reading = null;
-                if (StringParser.TryParseLine(line, columnIndex, out reading)) {
-                    DateTime dt = DateTime.Parse(reading.DateTime);
+            for (int i = fileReadContainer.CurrentLineCount; i > 0; i--) {
+                if (fileReadContainer.Values[count] == null) {
+                    fileReadContainer.Values[count] = new ValueReadingDto();
+                }
+                if (StringParser.TryParseLine(fileReadContainer.Lines[i - 1].Chars, columnIndex, fileReadContainer.Values[count])) {
+                    DateTime dt = DateTime.Parse(fileReadContainer.Values[count].DateTime);
                     if (!first.HasValue) {
                         first = dt;
                     }
                     if (!TimePeriods.IsDateWithinBoundry(dt, first.Value, timeSpan)) {
                         break;
                     }
-                    list.Add(reading);
+                    count++;
                 }
             }
-            return list;
+            return count;
         }
     }
 }

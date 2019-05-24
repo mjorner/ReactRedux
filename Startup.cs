@@ -34,6 +34,7 @@ namespace ReactRedux {
             services.AddSingleton<AppConfiguration>(appConfiguration);
             services.AddTransient<IFileReader, FileReader>();
             services.AddTransient<IStringCompressor, SnappyStringCompressor>();
+            services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

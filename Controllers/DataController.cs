@@ -15,11 +15,14 @@ namespace ReactRedux.Controllers {
         private readonly AppConfiguration Configuration;
         private readonly IFileReader FileReader;
         private readonly IStringCompressor StringCompressor;
+        private readonly IFileReadContainerPool FileReadContainerPool;
 
-        public DataController(AppConfiguration configuration, IFileReader fileReader, IStringCompressor stringCompressor) {
+        public DataController(AppConfiguration configuration, IFileReader fileReader, 
+                                IStringCompressor stringCompressor, IFileReadContainerPool fileReadContainerPool) {
             Configuration = configuration;
             FileReader = fileReader;
             StringCompressor = stringCompressor;
+            FileReadContainerPool = fileReadContainerPool;
         }
 
         [HttpGet("[action]")]
@@ -35,12 +38,13 @@ namespace ReactRedux.Controllers {
         [HttpGet("[action]")]
         public async Task<CopmpressedDataDto> ReadGraphData(string filename, int columnIndex, string timeSpan) {
             if (filename == null) {
-                return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(new List<ValueReadingDto>()) };
+                return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(new ValueReadingDto[0]) };
             }
-
-            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
-            List<ValueReadingDto> list = StringParser.ParseValueReadings(lines, columnIndex, timeSpan);
-            string str = StringCompressor.Compress(list);
+            FileReadContainer fileReadContainer = FileReadContainerPool.Rent();
+            await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}", fileReadContainer);
+            int count = StringParser.ParseValueReadings(fileReadContainer, columnIndex, timeSpan);
+            string str = StringCompressor.Compress(fileReadContainer.Values.Take(count-1));
+            FileReadContainerPool.Return(fileReadContainer);
             return new CopmpressedDataDto() { Base64Bytes = str };
         }
 
