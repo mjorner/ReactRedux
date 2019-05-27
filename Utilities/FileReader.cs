@@ -27,8 +27,8 @@ namespace ReactRedux.Utilities {
                     while (!reader.EndOfStream) {
                         ReadLine(reader, fileReadContainer);
                         fileReadContainer.CurrentLineCount++;
-                        if (fileReadContainer.CurrentLineCount > fileReadContainer.Lines.Length) {
-                            throw new Exception("Trying to read more lines than allocated by graph_line_count");
+                        if (fileReadContainer.CurrentLineCount >= fileReadContainer.Lines.Length) {
+                            throw new Exception($"Trying to read more lines than allocated by graph_line_count for {filePath}.");
                         }
                     }
                     reader.Close();
@@ -48,8 +48,8 @@ namespace ReactRedux.Utilities {
             char ch = '\0';
             do {
                 ch = (char) reader.Read();
-                if (charIndex > fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars.Length) {
-                     throw new Exception("Trying to read more lines than allocated by graph_line_length");
+                if (charIndex >= fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars.Length) {
+                     throw new Exception("Trying to read more chars than allocated by graph_line_length");
                 }
                 fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[charIndex++] = ch;
             } while (ch != NEWLINE);
