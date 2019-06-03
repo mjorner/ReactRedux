@@ -13,67 +13,26 @@ namespace ReactRedux {
         public string Uname { get { return Configuration["uname"]; } }
         public string Pw { get { return Configuration["pw"]; } }
         public string AppTitle { get { return Configuration["app_title"]; } }
-        public string SnapShotPath {
-            get {
-                string s = Configuration["snap_shot_path"];
-                return s == null ? "" : s;
-            }
-        }
-        public string SnapShotFile {
-            get {
-                string s = Configuration["snap_shot_file"];
-                return s == null ? "" : s;
-            }
-        }
-        public string LogPath {
-            get { 
-                string s = Configuration["log_path"];
-                return s == null ? "" : s;
-            }
-        }
-        private string LogFilesRaw {
-            get { 
-                string s = Configuration["log_files"];
-                return s == null ? "" : s;
-            }
-        }
-        public string LogFiles {
-            get {
-                return ValidateAvailableFiles(LogFilesRaw);
-            }
-        }
+        public string SnapShotPath => TryParseStringEmptyDefault("snap_shot_path");
+        public string SnapShotFile => TryParseStringEmptyDefault("snap_shot_file");
+        public string LogPath => TryParseStringEmptyDefault("log_path");
+        private string LogFilesRaw => TryParseStringEmptyDefault("log_files");
+        public string LogFiles => ValidateAvailableFiles(LogFilesRaw);
+        public int GraphLineLength => TryParseIntWithDefault("graph_line_length", 100);
+        public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
+        public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
 
-        public int GraphLineLength {
-            get {
-                string s = Configuration["graph_line_length"];
-                int len;
-                if (int.TryParse(s, out len)) {
-                    return len;
-                }
-                return 100;        
-            }
+        private string TryParseStringEmptyDefault(string key) {
+            string s = Configuration[key];
+            return s == null ? "" : s;
         }
-
-        public int GraphConcurrencyCount {
-            get {
-                string s = Configuration["graph_concurrency_count"];
-                int len;
-                if (int.TryParse(s, out len)) {
-                    return len;
-                }
-                return 10;        
+        private int TryParseIntWithDefault(string key, int defaultValue) {
+            string s = Configuration[key];
+            int value;
+            if (int.TryParse(s, out value)) {
+                return value;
             }
-        }
-
-        public int GraphLineCount {
-            get {
-                string s = Configuration["graph_line_count"];
-                int len;
-                if (int.TryParse(s, out len)) {
-                    return len;
-                }
-                return 50000;        
-            }
+            return defaultValue;
         }
 
         private string ValidateAvailableFiles(string allLogFiles) {
