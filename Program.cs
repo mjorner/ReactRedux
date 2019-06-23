@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace ReactRedux {
     public class Program {
         public static void Main(string[] args) {
+            // config json files should be in args 
             CreateWebHostBuilder(args).Build().Run();
         }
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -24,9 +21,9 @@ namespace ReactRedux {
             .ConfigureAppConfiguration((hostingContext, config) => {
                 string currentPath = Directory.GetCurrentDirectory();
                 config.SetBasePath(currentPath);
-                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webappconfig.json"; 
+                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webappconfig.json";
                 config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
-                configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json"; 
+                configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json";
                 config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
             })
             .UseStartup<Startup>()

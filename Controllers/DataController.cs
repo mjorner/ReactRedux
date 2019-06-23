@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,7 +8,8 @@ using ReactRedux.Dtos;
 using ReactRedux.Utilities;
 using Microsoft.Extensions.Logging;
 
-namespace ReactRedux.Controllers {
+namespace ReactRedux.Controllers
+{
     [Route("api/[controller]")]
     public class DataController : Controller {
         private readonly AppConfiguration Configuration;

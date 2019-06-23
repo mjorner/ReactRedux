@@ -1,12 +1,11 @@
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-using ReactRedux.Dtos;
 
 namespace ReactRedux {
     public sealed class AppConfiguration {
         private readonly IConfiguration Configuration;
-        public AppConfiguration (IConfiguration configuration) {
+        public AppConfiguration(IConfiguration configuration) {
             Configuration = configuration;
         }
         public string DataPath { get { return Configuration["data_path"]; } }
@@ -37,36 +36,36 @@ namespace ReactRedux {
 
         private string ValidateAvailableFiles(string allLogFiles) {
             string[] files = allLogFiles.Split(';').Where(x => File.Exists($"{LogPath}{x}")).ToArray();
-            if (files.Length == 0) { 
+            if (files.Length == 0) {
                 return "";
             }
             return files.Aggregate((current, next) => current + ';' + next);
         }
 
-        public void Validate () {
-            if (DataPath.Last () != System.IO.Path.DirectorySeparatorChar) {
-                throw new System.Exception ($"DataPath {DataPath} must end with {System.IO.Path.DirectorySeparatorChar}.");
+        public void Validate() {
+            if (DataPath.Last() != System.IO.Path.DirectorySeparatorChar) {
+                throw new System.Exception($"DataPath {DataPath} must end with {System.IO.Path.DirectorySeparatorChar}.");
             }
-            if (!System.IO.Directory.Exists (DataPath)) {
-                throw new System.Exception ($"DataPath does not exist.");
+            if (!System.IO.Directory.Exists(DataPath)) {
+                throw new System.Exception($"DataPath does not exist.");
             }
             if (SnapShotFile.Length == 0 && SnapShotPath.Length != 0) {
-                throw new System.Exception ($"SnapShotFile is missing.");
+                throw new System.Exception($"SnapShotFile is missing.");
             }
             if (SnapShotFile.Length != 0 && SnapShotPath.Length == 0) {
-                throw new System.Exception ($"SnapShotPath is missing.");
+                throw new System.Exception($"SnapShotPath is missing.");
             }
             if (LogPath.Length == 0 && LogFilesRaw.Length != 0) {
-                throw new System.Exception ($"LogPath is missing.");
+                throw new System.Exception($"LogPath is missing.");
             }
             if (LogPath.Length != 0 && LogFilesRaw.Length == 0) {
-                throw new System.Exception ($"LogFiles is missing.");
+                throw new System.Exception($"LogFiles is missing.");
             }
             if (Uname == null) {
-                 throw new System.Exception ($"Uname is missing.");
+                throw new System.Exception($"Uname is missing.");
             }
             if (Pw == null) {
-                 throw new System.Exception ($"Pw is missing.");
+                throw new System.Exception($"Pw is missing.");
             }
         }
     }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 
-
 namespace ReactRedux.Utilities {
     internal class BlockingContainerPool<T> {
         private readonly BlockingCollection<T> Pool;

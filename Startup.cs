@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -10,9 +9,9 @@ using ReactRedux.Utilities;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
-namespace ReactRedux {
+namespace ReactRedux
+{
     public class Startup {
         private readonly ILoggerFactory LoggerFactory;
         public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) {
