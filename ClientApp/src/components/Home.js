@@ -19,15 +19,27 @@ class Home extends Component {
     const url = "api/Data/GetFilenames";
     const d = await fetch(url);
     const json = await d.json();
+    var fileNames = this.removeInvalidFileNames(json.fileNames);
     var fc = [];
-    for (var i = 0; i < json.fileNames.length; i++) {
-      fc[i] = new LoadClass(json.fileNames[i].title, "Loading...")
+    for (var i = 0; i < fileNames.length; i++) {
+      fc[i] = new LoadClass(fileNames[i].title, "Loading...")    
     }
     this.setState({filecontent: fc});
 
-    for (i = 0; i < json.fileNames.length; i++) {
-      this.doReadFile(json.fileNames[i].outFile, json.fileNames[i].title, json.fileNames[i].type, i);
+    for (i = 0; i < fileNames.length; i++) {
+      this.doReadFile(fileNames[i].outFile, fileNames[i].title, fileNames[i].type, i);
     }
+  }
+
+  removeInvalidFileNames(fileNames) {
+    var pruned = [];
+    var prunedIndex = 0;
+    for (var i = 0; i < fileNames.length; i++) {
+      if (fileNames[i].outFile.length > 0) {
+        pruned[prunedIndex++] = fileNames[i];
+      }
+    }
+    return pruned;
   }
 
   async doReadFile(filename, title, type, i) {

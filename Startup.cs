@@ -3,15 +3,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ReactRedux.Utilities;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using ReactRedux.Utilities;
 
-namespace ReactRedux
-{
+namespace ReactRedux {
     public class Startup {
         private readonly ILoggerFactory LoggerFactory;
         public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) {
@@ -64,22 +63,21 @@ namespace ReactRedux
             AppConfiguration appConfiguration = new AppConfiguration(Configuration);
             var provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".stat"] = "text/plain";
-            app.UseStaticFiles(new StaticFileOptions {    
+            app.UseStaticFiles(new StaticFileOptions {
                 FileProvider = new PhysicalFileProvider(appConfiguration.DataPath),
-                RequestPath = "",
-                ContentTypeProvider = provider
+                    RequestPath = "",
+                    ContentTypeProvider = provider
             });
 
             if (appConfiguration.SnapShotPath.Length != 0) {
                 provider = new FileExtensionContentTypeProvider();
                 provider.Mappings[".jpg"] = "image/jpg";
-                app.UseStaticFiles(new StaticFileOptions {    
-                FileProvider = new PhysicalFileProvider(appConfiguration.SnapShotPath),
-                RequestPath = "/images",
-                ContentTypeProvider = provider
-            });
+                app.UseStaticFiles(new StaticFileOptions {
+                    FileProvider = new PhysicalFileProvider(appConfiguration.SnapShotPath),
+                        RequestPath = "/images",
+                        ContentTypeProvider = provider
+                });
             }
-
 
             app.UseMvc(routes => {
                 routes.MapRoute(
