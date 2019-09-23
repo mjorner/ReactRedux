@@ -12,6 +12,7 @@ namespace ReactRedux {
         public string Uname { get { return Configuration["uname"]; } }
         public string Pw { get { return Configuration["pw"]; } }
         public string AppTitle { get { return Configuration["app_title"]; } }
+        public string WebConfigPath => TryParseStringEmptyDefault("webconfig_path");
         public string SnapShotPath => TryParseStringEmptyDefault("snap_shot_path");
         public string SnapShotFile => TryParseStringEmptyDefault("snap_shot_file");
         public string LogPath => TryParseStringEmptyDefault("log_path");
@@ -48,6 +49,9 @@ namespace ReactRedux {
             }
             if (!System.IO.Directory.Exists(DataPath)) {
                 throw new System.Exception($"DataPath does not exist.");
+            }
+            if (!File.Exists(WebConfigPath)) {
+                throw new System.Exception($"WebConfigPath does not exist.");
             }
             if (SnapShotFile.Length == 0 && SnapShotPath.Length != 0) {
                 throw new System.Exception($"SnapShotFile is missing.");

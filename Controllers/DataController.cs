@@ -30,9 +30,7 @@ namespace ReactRedux.Controllers
 
         [HttpGet("[action]")]
         public async Task<InitInfoDto> GetFilenames() {
-            string currentPath = Directory.GetCurrentDirectory();
-            string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webconfig.json"; 
-            List<string> lines = await FileReader.ReadAllLinesAsync(configPath);
+            List<string> lines = await FileReader.ReadAllLinesAsync(Configuration.WebConfigPath);
             string content = string.Join("", lines);
             List<ReadingFilenamesDto> list = JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
             return new InitInfoDto() { FileNames = list, TimePeriods = TimePeriods.AllTimePeriods };

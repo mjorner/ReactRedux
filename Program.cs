@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -21,9 +22,9 @@ namespace ReactRedux {
             .ConfigureAppConfiguration((hostingContext, config) => {
                 string currentPath = Directory.GetCurrentDirectory();
                 config.SetBasePath(currentPath);
-                string configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webappconfig.json";
+                string configPath = Environment.GetEnvironmentVariable("RECEIVER_CONFIG");
                 config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
-                configPath = $"{Directory.GetParent(currentPath)}{Path.DirectorySeparatorChar}webauth.json";
+                configPath = Environment.GetEnvironmentVariable("WEBAPP_CONFIG");
                 config.AddJsonFile(configPath, optional : false, reloadOnChange : true);
             })
             .UseStartup<Startup>()
