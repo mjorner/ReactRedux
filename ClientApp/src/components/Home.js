@@ -35,7 +35,7 @@ class Home extends Component {
     var pruned = [];
     var prunedIndex = 0;
     for (var i = 0; i < fileNames.length; i++) {
-      if (fileNames[i].outFile.length > 0) {
+      if (fileNames[i].outFile.length > 0 && fileNames[i].active) {
         pruned[prunedIndex++] = fileNames[i];
       }
     }

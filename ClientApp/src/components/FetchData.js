@@ -31,7 +31,7 @@ class FetchData extends Component {
     json = json.fileNames;
     const set = new Set();
     for (var i = 0; i < json.length; i++) {
-      if (json[i].csvFile.length > 0) {
+      if (json[i].csvFile.length > 0 && json[i].active) {
         this.setTypes(set, json[i].type)
       }
     }
@@ -53,6 +53,7 @@ class FetchData extends Component {
   }
 
   isCorrectType(json, type) {
+    if (!json.active) { return false; }
     const t = json.type.split(',');
     for (var i = 0; i < t.length; i++) {
       if (t[i] === type) {
