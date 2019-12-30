@@ -9,8 +9,8 @@ namespace ReactRedux {
             Configuration = configuration;
         }
         public string DataPath { get { return Configuration["data_path"]; } }
-        public string Uname { get { return Configuration["uname"]; } }
-        public string Pw { get { return Configuration["pw"]; } }
+        public string AuthSalt { get { return Configuration["web_auth_token_salt"]; } }
+        public string AuthToken { get { return Configuration["web_auth_token"]; } }
         public string AppTitle { get { return Configuration["app_title"]; } }
         public string WebConfigPath => TryParseStringEmptyDefault("webconfig_path");
         public string SnapShotPath => TryParseStringEmptyDefault("snap_shot_path");
@@ -21,7 +21,8 @@ namespace ReactRedux {
         public int GraphLineLength => TryParseIntWithDefault("graph_line_length", 100);
         public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
         public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
-
+        public int ShaIterations => TryParseIntWithDefault("sha_iterations", 1);
+        public int ShaRandomSaltLength => TryParseIntWithDefault("sha_random_salt_length", 16);
         private string TryParseStringEmptyDefault(string key) {
             string s = Configuration[key];
             return s == null ? "" : s;
@@ -65,11 +66,17 @@ namespace ReactRedux {
             if (LogPath.Length != 0 && LogFilesRaw.Length == 0) {
                 throw new System.Exception($"LogFiles is missing.");
             }
-            if (Uname == null) {
-                throw new System.Exception($"Uname is missing.");
+            if (AuthSalt == null) {
+                throw new System.Exception($"AuthSalt is missing.");
             }
-            if (Pw == null) {
-                throw new System.Exception($"Pw is missing.");
+            if (AuthToken == null) {
+                throw new System.Exception($"AuthToken is missing.");
+            }
+            if (ShaIterations < 1) {
+                 throw new System.Exception($"ShaIterations {ShaIterations} must be greater than 0.");
+            }
+            if (ShaRandomSaltLength < 1) {
+                 throw new System.Exception($"ShaRandomSaltLength {ShaRandomSaltLength} must be greater than 0.");
             }
         }
     }
