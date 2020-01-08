@@ -5,13 +5,16 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ReactRedux {
     public sealed class AuthenticationMiddleware {
         private readonly RequestDelegate Next;
         private readonly AppConfiguration Configuration;
+        private readonly ILogger<AuthenticationMiddleware> Logger;
         private byte[] ValidatedSha256AuthHeaderBytes = null;
         private readonly int ShaSaltBytesLength = 16;
+
         private byte[] ShaSaltBytes {
             get {
                 if (vShaSaltBytes == null) {
@@ -25,33 +28,50 @@ namespace ReactRedux {
         }
         private byte[] vShaSaltBytes = null;
 
-        public AuthenticationMiddleware(RequestDelegate next, AppConfiguration configuration) {
+        public AuthenticationMiddleware(RequestDelegate next, AppConfiguration configuration, ILogger<AuthenticationMiddleware> logger) {
             Next = next;
             Configuration = configuration;
             ShaSaltBytesLength = Configuration.ShaRandomSaltLength;
+            Logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context) {
-            if (context.Request.Path != null && context.Request.Path.Value.Contains(".stat")) {
-                await Next(context);
-            }
             if (!Configuration.AuthToken.Any()) {
                 await Next(context);
+                return;
             }
+            if (CanContinueWithoutAuth(context.Request.Path)) {
+                await Next(context);
+                return;
+            }
+            
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic")) {
                 if (VerifyArgon2Hash(authHeader)) {
                     await Next(context);
+                    return;
                 } else {
                     context.Response.Headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
-                    context.Response.StatusCode = 401; //Unauthorized
+                    context.Response.StatusCode = 401; //Unauthorized 
+                    Logger.LogWarning("Unauth wrong basic:" + GetAuthLogStr(authHeader, context.Request.Path));  
                     return; 
                 }
             } else {
                 context.Response.Headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
                 context.Response.StatusCode = 401; //Unauthorized
+                Logger.LogWarning("Unauth No basic found:" + GetAuthLogStr(authHeader, context.Request.Path));
                 return;
             }
+        }
+
+        private static string GetAuthLogStr(string authHeader, string path ) {
+            string s = $"AuthHeader: \"{authHeader}\", path: \"{path}\"";
+            return s;
+        }
+
+        private static bool CanContinueWithoutAuth(string path) {
+            if (path == null) { return true; }
+            return !path.Contains("api");
         }
 
         private bool VerifyArgon2Hash(string authHeader) {

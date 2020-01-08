@@ -37,6 +37,7 @@ namespace ReactRedux {
             services.AddTransient<IStringCompressor, SnappyStringCompressor>();
             ILogger<BlockingFileReadContainerPool> poolLogger = LoggerFactory.CreateLogger<BlockingFileReadContainerPool>();
             services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength, poolLogger));
+            services.AddSingleton<ILogger<AuthenticationMiddleware>>(LoggerFactory.CreateLogger<AuthenticationMiddleware>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
