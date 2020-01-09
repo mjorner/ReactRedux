@@ -64,14 +64,15 @@ namespace ReactRedux {
             }
         }
 
-        private static string GetAuthLogStr(string authHeader, string path ) {
-            string s = $"AuthHeader: \"{authHeader}\", path: \"{path}\"";
+        private static string GetAuthLogStr(string authHeader, PathString path) {
+            string s = $"AuthHeader: \"{authHeader}\", path: \"{(path.HasValue?path.Value:"no value")}\"";
             return s;
         }
 
-        private static bool CanContinueWithoutAuth(string path) {
+        private static bool CanContinueWithoutAuth(PathString path) {
             if (path == null) { return true; }
-            return !path.Contains("api");
+            if (!path.HasValue) { return true; }
+            return !path.Value.Contains("api");
         }
 
         private bool VerifyArgon2Hash(string authHeader) {
