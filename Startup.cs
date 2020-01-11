@@ -9,16 +9,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using ReactRedux.Utilities;
+using ReactRedux.Crypto;
 
 namespace ReactRedux {
     public class Startup {
         private readonly ILoggerFactory LoggerFactory;
+        private IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) {
             Configuration = configuration;
             LoggerFactory = loggerFactory;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
@@ -38,6 +39,7 @@ namespace ReactRedux {
             ILogger<BlockingFileReadContainerPool> poolLogger = LoggerFactory.CreateLogger<BlockingFileReadContainerPool>();
             services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength, poolLogger));
             services.AddSingleton<ILogger<AuthenticationMiddleware>>(LoggerFactory.CreateLogger<AuthenticationMiddleware>());
+            services.AddSingleton<ICridentialsValidator, CachedSha256HashValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
