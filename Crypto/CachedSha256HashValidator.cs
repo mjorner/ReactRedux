@@ -4,26 +4,17 @@ using System.Security.Cryptography;
 namespace ReactRedux.Crypto {
     public class CachedSha256HashValidator : Argon2CridentialsValidator {
         private static byte[] ValidatedSha256AuthHeaderBytes = null;
-        private readonly int ShaSaltBytesLength = 16;
-        private byte[] ShaSaltBytes {
-            get {
-                lock(SaltLock) {
-                    if (vShaSaltBytes == null) {
-                        using (RandomNumberGenerator rng = RandomNumberGenerator.Create()) {
-                            vShaSaltBytes = new byte[ShaSaltBytesLength];
-                            rng.GetBytes(vShaSaltBytes);
-                        }
-                    }
-                }
-                return vShaSaltBytes;
+        private const int ShaSaltBytesLength = 16;
+        private static byte[] ShaSaltBytes = null;
+
+        static CachedSha256HashValidator() {
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create()) {
+                ShaSaltBytes = new byte[ShaSaltBytesLength];
+                rng.GetBytes(ShaSaltBytes);
             }
         }
-        private static byte[] vShaSaltBytes = null;
-        private static readonly object SaltLock = new object();
 
-        public CachedSha256HashValidator(AppConfiguration configuration) : base(configuration) {
-            ShaSaltBytesLength = configuration.ShaRandomSaltLength;
-        }
+        public CachedSha256HashValidator(AppConfiguration configuration) : base(configuration) {}
 
         public override bool Verify(string authHeader) {
             if (ValidatedSha256AuthHeaderBytes != null) {

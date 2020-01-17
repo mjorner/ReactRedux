@@ -27,7 +27,7 @@ namespace ReactRedux {
                 await Next(context);
                 return;
             }
-            
+
             string authHeader = context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith("Basic")) {
                 if (CridentialsValidator.Verify(authHeader)) {
@@ -36,8 +36,8 @@ namespace ReactRedux {
                 } else {
                     context.Response.Headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
                     context.Response.StatusCode = 401; //Unauthorized 
-                    Logger.LogWarning("Unauth wrong basic:" + GetAuthLogStr(authHeader, context.Request.Path));  
-                    return; 
+                    Logger.LogWarning("Unauth wrong basic:" + GetAuthLogStr(authHeader, context.Request.Path));
+                    return;
                 }
             } else {
                 context.Response.Headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
@@ -55,7 +55,8 @@ namespace ReactRedux {
         private static bool CanContinueWithoutAuth(PathString path) {
             if (path == null) { return true; }
             if (!path.HasValue) { return true; }
-            return !path.Value.Contains("api");
+            if (!path.Value.Contains("api")) { return true; }
+            return path.Value.Contains("GetAppConfiguration");
         }
     }
 }

@@ -22,7 +22,6 @@ namespace ReactRedux {
         public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
         public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
         public int ShaIterations => TryParseIntWithDefault("sha_iterations", 1);
-        public int ShaRandomSaltLength => TryParseIntWithDefault("sha_random_salt_length", 16);
         private string TryParseStringEmptyDefault(string key) {
             string s = Configuration[key];
             return s == null ? "" : s;
@@ -74,9 +73,6 @@ namespace ReactRedux {
             }
             if (ShaIterations < 1) {
                  throw new System.Exception($"ShaIterations {ShaIterations} must be greater than 0.");
-            }
-            if (ShaRandomSaltLength < 1) {
-                 throw new System.Exception($"ShaRandomSaltLength {ShaRandomSaltLength} must be greater than 0.");
             }
         }
     }
