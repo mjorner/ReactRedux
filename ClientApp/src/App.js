@@ -6,6 +6,7 @@ import FetchData from './components/FetchData';
 import Stats from './components/Stats';
 import Snapshot from './components/Snapshot';
 import SysLog from './components/SysLog';
+import Login from './components/Login';
 
 class App extends React.Component {
   constructor(props) {
@@ -41,6 +42,12 @@ class App extends React.Component {
     }
   }
 
+  renderLogin(title) {
+    return (
+      <Route path='/login' render={props => <Login {...props} app_title={title}/>}/>
+    )
+  }
+
   render() {  
     if (this.state.app_config === null) {
       return (
@@ -58,6 +65,7 @@ class App extends React.Component {
           <Route path='/stats' render={props => <Stats {...props} app_title={title} setReloadHandler={handler => this.reloadChild = handler}/>}/>
           {this.renderLogFiles(title, log_files)}
           {this.renderSnapShot(title, snapshot_file_name)}
+          {this.renderLogin(title)}
         </Layout>
       )
     }

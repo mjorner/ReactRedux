@@ -21,7 +21,7 @@ namespace ReactRedux {
         public int GraphLineLength => TryParseIntWithDefault("graph_line_length", 100);
         public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
         public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
-        public int ShaIterations => TryParseIntWithDefault("sha_iterations", 1);
+        public string Secret => TryParseStringEmptyDefault("secret");
         private string TryParseStringEmptyDefault(string key) {
             string s = Configuration[key];
             return s == null ? "" : s;
@@ -71,9 +71,12 @@ namespace ReactRedux {
             if (AuthToken == null) {
                 throw new System.Exception($"AuthToken is missing.");
             }
-            if (ShaIterations < 1) {
-                 throw new System.Exception($"ShaIterations {ShaIterations} must be greater than 0.");
+            if (Secret.Length == 0) {
+                throw new System.Exception($"Secret is missing.");
             }
+            /*if (ShaIterations < 1) {
+                 throw new System.Exception($"ShaIterations {ShaIterations} must be greater than 0.");
+            }*/
         }
     }
 }

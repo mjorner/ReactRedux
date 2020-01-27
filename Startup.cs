@@ -1,15 +1,16 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using ReactRedux.Utilities;
+using Microsoft.IdentityModel.Tokens;
 using ReactRedux.Crypto;
+using ReactRedux.Utilities;
 
 namespace ReactRedux {
     public class Startup {
@@ -33,13 +34,29 @@ namespace ReactRedux {
             AppConfiguration appConfiguration = new AppConfiguration(Configuration);
             appConfiguration.Validate();
 
+            var key = Encoding.ASCII.GetBytes(appConfiguration.Secret);
+            services.AddAuthentication(x => {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x => {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
             services.AddSingleton<AppConfiguration>(appConfiguration);
             services.AddTransient<IFileReader, FileReader>();
             services.AddTransient<IStringCompressor, SnappyStringCompressor>();
             ILogger<BlockingFileReadContainerPool> poolLogger = LoggerFactory.CreateLogger<BlockingFileReadContainerPool>();
             services.AddSingleton<IFileReadContainerPool>(new BlockingFileReadContainerPool(appConfiguration.GraphConcurrencyCount, appConfiguration.GraphLineCount, appConfiguration.GraphLineLength, poolLogger));
-            services.AddSingleton<ILogger<AuthenticationMiddleware>>(LoggerFactory.CreateLogger<AuthenticationMiddleware>());
-            services.AddSingleton<ICridentialsValidator, CachedSha256HashValidator>();
+            services.AddSingleton<ICridentialsValidator, Argon2CridentialsValidator>();
+            services.AddTransient<INowTokenManager, NowTokenManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,10 +68,6 @@ namespace ReactRedux {
                 app.UseHsts();
             }
 
-            if (!env.IsDevelopment()) {
-                app.UseMiddleware<AuthenticationMiddleware>();
-            }
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
@@ -63,24 +76,7 @@ namespace ReactRedux {
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            AppConfiguration appConfiguration = new AppConfiguration(Configuration);
-            var provider = new FileExtensionContentTypeProvider();
-            provider.Mappings[".stat"] = "text/plain";
-            app.UseStaticFiles(new StaticFileOptions {
-                FileProvider = new PhysicalFileProvider(appConfiguration.DataPath),
-                    RequestPath = "",
-                    ContentTypeProvider = provider
-            });
-
-            if (appConfiguration.SnapShotPath.Length != 0) {
-                provider = new FileExtensionContentTypeProvider();
-                provider.Mappings[".jpg"] = "image/jpg";
-                app.UseStaticFiles(new StaticFileOptions {
-                    FileProvider = new PhysicalFileProvider(appConfiguration.SnapShotPath),
-                        RequestPath = "/images",
-                        ContentTypeProvider = provider
-                });
-            }
+            app.UseAuthentication();
 
             app.UseMvc(routes => {
                 routes.MapRoute(

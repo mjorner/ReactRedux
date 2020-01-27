@@ -4,6 +4,7 @@ import './SysLog.css';
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
 import cookie from 'react-cookies'
+import { authHeader } from '../helpers';
 
 class SysLog extends Component {
     constructor(props) {
@@ -28,13 +29,18 @@ class SysLog extends Component {
         this.showData(log_sel, dropdown_values);
     }
 
-    showData(logfile, dropdown_values) {
+    async showData(logfile, dropdown_values) {
         const url = "api/Data/ReadSysLog?filename="+logfile;
-        fetch(url)
-            .then(results => { return results.json(); })
-            .then(data => {
-                this.setState({ filecontent: data.text, selected: logfile, dropdown_options: dropdown_values });
-            });
+        const requestOptions = {
+            headers: authHeader()
+          };
+        const d = await fetch(url, requestOptions);
+        if (!d.ok) {
+            this.props.history.push('/login')
+            return;
+        }
+        const json = await d.json();
+        this.setState({ filecontent: json.text, selected: logfile, dropdown_options: dropdown_values });
     }
 
     onSelectType(option) {

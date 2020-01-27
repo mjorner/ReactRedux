@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Snapshot.css';
+import { authHeader } from '../helpers';
 
 class Snapshot extends Component {
     constructor(props) {
         super(props);
         document.title = this.props.app_title;
-        this.state = { dt: Date.now() };
+        this.state = { dt: Date.now(), token: null };
         this.reload = this.reload.bind(this);
     }
 
@@ -15,12 +16,27 @@ class Snapshot extends Component {
         this.reload();
     }
 
-    reload() {
-        this.setState({dt: Date.now()});
+    async reload() {
+        const url = "api/Data/GetSnapshotToken"
+        const requestOptions = {
+            headers: authHeader()
+        };
+        const d = await fetch(url, requestOptions);
+        if (!d.ok) {
+            this.props.history.push('/login')
+            return;
+        }
+        var json = await d.json();
+        this.setState({dt: Date.now(), token: json.text});
     }
 
     render() {
-        const file_name = "images/"+this.props.snapshot_file_name+"?"+this.state.dt;
+        if (this.state.token === null) {
+            return (
+            <div></div>
+          )
+        }
+        const file_name = "api/Data/Image?token="+this.state.token+"&dt="+this.state.dt;;
         return (
             <div>
                 <div className="pic_div">

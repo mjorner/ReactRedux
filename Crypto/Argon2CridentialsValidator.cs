@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Isopoh.Cryptography.Argon2;
 
@@ -10,10 +9,7 @@ namespace ReactRedux.Crypto {
             Configuration = configuration;
         }
 
-        public virtual bool Verify(string authHeader) {
-            string encodedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
-            Encoding encoding = Encoding.GetEncoding("iso-8859-1");
-            string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));      
+        public bool Verify(string usernamePassword) {
             Argon2Config config = GetArgon2Config(usernamePassword);
             bool verified = Argon2.Verify(Configuration.AuthToken, config);
             return verified;

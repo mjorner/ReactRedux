@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { authHeader } from '../helpers';
 
 class Home extends Component {
 
@@ -17,7 +18,14 @@ class Home extends Component {
 
   async reload() {
     const url = "api/Data/GetFilenames";
-    const d = await fetch(url);
+    const requestOptions = {
+      headers: authHeader()
+    };
+    const d = await fetch(url, requestOptions);
+    if (!d.ok) {
+      this.props.history.push('/login')
+      return;
+    }
     const json = await d.json();
     var fileNames = this.removeInvalidFileNames(json.fileNames);
     var fc = [];
@@ -44,7 +52,14 @@ class Home extends Component {
 
   async doReadFile(filename, title, type, i) {
     const url = "api/Data/ReadOutFile?filename="+filename+"&title="+title;
-    const d = await fetch(url);
+    const requestOptions = {
+      headers: authHeader()
+    };
+    const d = await fetch(url, requestOptions);
+    if (!d.ok) {
+      this.props.history.push('/login')
+      return;
+    }
     const data = await d.json();
     var st = this.state.filecontent;
     const formatted = this.doFormat(data.str, type);
