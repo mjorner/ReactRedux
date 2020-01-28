@@ -9,7 +9,8 @@ class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            submitted: false
+            submitted: false,
+            loggingIn: false
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -32,6 +33,7 @@ class Login extends Component {
     }
 
     async login(username, password) {
+        this.setState({ loggingIn: true });
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -45,11 +47,11 @@ class Login extends Component {
             localStorage.setItem('user', str);
             this.props.history.push('/')
         }
+        this.setState({ loggingIn: false });
     }
 
     render() {
-        const { loggingIn } = this.props;
-        const { username, password, submitted } = this.state;
+        const { username, password, submitted, loggingIn } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h2>Login</h2>
