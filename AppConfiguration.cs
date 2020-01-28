@@ -22,10 +22,12 @@ namespace ReactRedux {
         public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
         public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
         public string Secret => TryParseStringEmptyDefault("secret");
+        
         private string TryParseStringEmptyDefault(string key) {
             string s = Configuration[key];
             return s == null ? "" : s;
         }
+        
         private int TryParseIntWithDefault(string key, int defaultValue) {
             string s = Configuration[key];
             int value;
@@ -74,9 +76,6 @@ namespace ReactRedux {
             if (Secret.Length == 0) {
                 throw new System.Exception($"Secret is missing.");
             }
-            /*if (ShaIterations < 1) {
-                 throw new System.Exception($"ShaIterations {ShaIterations} must be greater than 0.");
-            }*/
         }
     }
 }

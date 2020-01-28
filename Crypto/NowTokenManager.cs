@@ -18,7 +18,7 @@ namespace ReactRedux.Crypto {
 
         private string GenerateToken(DateTime now) {
             using(var sha = SHA256.Create()) {
-                byte[] bytes = Encoding.UTF8.GetBytes($"{Configuration.AuthSalt}{now.Year}{now.Month}{now.Day}");
+                byte[] bytes = Encoding.UTF8.GetBytes($"{Configuration.AuthSalt}{now.Year}{now.Month}{now.Day}{now.Hour}{now.Minute}");
                 bytes = sha.ComputeHash(bytes);
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < bytes.Length; i++) {
@@ -34,13 +34,8 @@ namespace ReactRedux.Crypto {
             if (SlowByteByByteEquals(currentHash, token)) {
                 return true;
             }
-            if (now.Hour == 0 && now.Minute < 5) {
-                currentHash = GenerateToken(now.AddMinutes(-10));
-                if (SlowByteByByteEquals(currentHash, token)) {
-                    return true;
-                }
-            }
-            return false;
+            currentHash = GenerateToken(now.AddMinutes(-1));
+            return SlowByteByByteEquals(currentHash, token);
         }
 
         private static bool SlowByteByByteEquals(string a, string b) {
