@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { authHeader } from '../helpers';
+import { fetchJson } from '../helpers';
 
 class Home extends Component {
 
@@ -12,21 +12,16 @@ class Home extends Component {
   }
 
   async componentDidMount() {
-    this.props.setReloadHandler(this.reload);
+    this.props.setReloadHandler(this.reload); 
     this.reload();
   }
 
   async reload() {
     const url = "api/Data/GetFilenames";
-    const requestOptions = {
-      headers: authHeader()
-    };
-    const d = await fetch(url, requestOptions);
-    if (!d.ok) {
-      this.props.history.push('/login')
+    const [ok, json] = await fetchJson(url, this.props.history);
+    if (!ok) {
       return;
     }
-    const json = await d.json();
     var fileNames = this.removeInvalidFileNames(json.fileNames);
     var fc = [];
     for (var i = 0; i < fileNames.length; i++) {
@@ -52,15 +47,10 @@ class Home extends Component {
 
   async doReadFile(filename, title, type, i) {
     const url = "api/Data/ReadOutFile?filename="+filename+"&title="+title;
-    const requestOptions = {
-      headers: authHeader()
-    };
-    const d = await fetch(url, requestOptions);
-    if (!d.ok) {
-      this.props.history.push('/login')
+    const [ok, data] = await fetchJson(url, this.props.history);
+    if (!ok) {
       return;
     }
-    const data = await d.json();
     var st = this.state.filecontent;
     const formatted = this.doFormat(data.str, type);
     data.str = formatted;

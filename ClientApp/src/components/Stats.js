@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Stats.css';
-import { authHeader } from '../helpers';
+import { fetchJson } from '../helpers';
 
 class Stats extends Component {
     constructor(props) {
@@ -18,15 +18,10 @@ class Stats extends Component {
 
     async reload() {
         const url = "api/Data/ReadTextFile?filename=s.stat";
-        const requestOptions = {
-            headers: authHeader()
-          };
-        const d = await fetch(url, requestOptions);
-        if (!d.ok) {
-            this.props.history.push('/login')
+        const [ok, json] = await fetchJson(url, this.props.history);
+        if (!ok) {
             return;
         }
-        const json = await d.json();
         this.setState({ filecontent: json.text });
     }
 

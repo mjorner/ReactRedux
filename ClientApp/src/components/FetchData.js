@@ -6,7 +6,7 @@ import no_graph from '../../src/no_graph.png'
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
 import cookie from 'react-cookies'
-import { authHeader } from '../helpers';
+import { fetchJson } from '../helpers';
 
 class FetchData extends Component {
 
@@ -26,15 +26,10 @@ class FetchData extends Component {
 
   async reload() {
     const url = "api/Data/GetFilenames"
-    const requestOptions = {
-      headers: authHeader()
-    };
-    const d = await fetch(url, requestOptions);
-    if (!d.ok) {
-      this.props.history.push('/login')
+    var [ok, json] = await fetchJson(url, this.props.history);
+    if (!ok) {
       return;
     }
-    var json = await d.json();
     const timePeriods = json.timePeriods;
     json = json.fileNames;
     const set = new Set();
@@ -111,18 +106,13 @@ class FetchData extends Component {
 
   async doRenderGraphFromFile(filename, title, i, columnIndex, timeSpan) {
     const url = "api/Data/ReadGraphData?filename=" + filename + "&columnIndex=" + columnIndex + "&timeSpan=" + timeSpan;
-    const requestOptions = {
-      headers: authHeader()
-    };
-    const d = await fetch(url, requestOptions);
-    if (!d.ok) {
-      this.props.history.push('/login')
+    const [ok, json] = await fetchJson(url, this.props.history);
+    if (!ok) {
       return;
     }
-    const json = await d.json();
-    var SnappyJS = require('snappyjs');
+    var snappyJS = require('snappyjs');
     const buffer = Uint8Array.from(atob(json.base64Bytes), c => c.charCodeAt(0))
-    const output = this.bin2String(SnappyJS.uncompress(buffer));
+    const output = this.bin2String(snappyJS.uncompress(buffer));
     const subJson = JSON.parse(output);
     const x = this.createDates(subJson);
     const y = this.createValues(subJson);
