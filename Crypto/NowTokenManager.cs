@@ -10,15 +10,15 @@ namespace ReactRedux.Crypto {
         }
 
         public string GenerateToken() {
-            return GenerateToken(DateTime.UtcNow);
+            return GenerateToken(DateTime.UtcNow, Configuration.AuthSalt);
         }
         public bool ValidateToken(string token) {
-            return CompareToken(token);
+            return CompareToken(token, Configuration.AuthSalt);
         }
 
-        private string GenerateToken(DateTime now) {
+        private static string GenerateToken(DateTime now, string salt) {
             using(var sha = SHA256.Create()) {
-                byte[] bytes = Encoding.UTF8.GetBytes($"{Configuration.AuthSalt}{now.Year}{now.Month}{now.Day}{now.Hour}{now.Minute}");
+                byte[] bytes = Encoding.UTF8.GetBytes($"{salt}{now.Year}{now.Month}{now.Day}{now.Hour}{now.Minute}");
                 bytes = sha.ComputeHash(bytes);
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < bytes.Length; i++) {
@@ -28,13 +28,13 @@ namespace ReactRedux.Crypto {
             }
         }
 
-        private bool CompareToken(string token) {
+        private static bool CompareToken(string token, string salt) {
             DateTime now = DateTime.UtcNow;
-            string currentHash = GenerateToken(now);
+            string currentHash = GenerateToken(now, salt);
             if (SlowByteByByteEquals(currentHash, token)) {
                 return true;
             }
-            currentHash = GenerateToken(now.AddMinutes(-1));
+            currentHash = GenerateToken(now.AddMinutes(-1), salt);
             return SlowByteByByteEquals(currentHash, token);
         }
 

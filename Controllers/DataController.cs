@@ -66,7 +66,7 @@ namespace ReactRedux.Controllers {
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new AuthResponse { Token = tokenString, Username = userDto.Username });
+            return Ok(new AuthResponseDto { Token = tokenString, Username = userDto.Username });
         }
 
         [HttpGet("[action]")]
