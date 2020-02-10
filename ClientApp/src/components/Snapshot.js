@@ -17,7 +17,7 @@ class Snapshot extends Component {
     }
 
     async reload() {
-        const url = "api/Data/GetSnapshotToken"
+        const url = "api/SnapShot/GetToken"
         const [ok, json] = await fetchJson(url, this.props.history);
         if (!ok) {
             return;
@@ -31,7 +31,7 @@ class Snapshot extends Component {
             <div></div>
           )
         }
-        const file_name = "api/Data/Image?token="+this.state.token+"&dt="+this.state.dt;;
+        const file_name = "api/SnapShot/GetSnapShot?token="+this.state.token+"&dt="+this.state.dt;;
         return (
             <div>
                 <div className="pic_div">

@@ -39,7 +39,7 @@ class Login extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         };
-        const url = "api/Data/authenticate";
+        const url = "api/Auth/Authenticate";
         const d = await fetch(url, requestOptions);
         if (d.ok) {
             var res = await d.json();

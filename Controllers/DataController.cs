@@ -1,14 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ReactRedux.Crypto;
 using ReactRedux.Dtos;
@@ -23,8 +18,6 @@ namespace ReactRedux.Controllers {
         private readonly IStringCompressor StringCompressor;
         private readonly IFileReadContainerPool FileReadContainerPool;
         private readonly ILogger Logger;
-        private readonly ICridentialsValidator CridentialsValidator;
-        private readonly INowTokenManager NowTokenManager;
 
         public DataController(AppConfiguration configuration, IFileReader fileReader,
             IStringCompressor stringCompressor, IFileReadContainerPool fileReadContainerPool,
@@ -35,38 +28,12 @@ namespace ReactRedux.Controllers {
             StringCompressor = stringCompressor;
             FileReadContainerPool = fileReadContainerPool;
             Logger = logger;
-            CridentialsValidator = cridentialsValidator;
-            NowTokenManager = nowTokenManager;
         }
 
         [AllowAnonymous]
         [HttpGet("[action]")]
         public ConfigurationDto GetAppConfiguration() {
             return new ConfigurationDto() { AppTitle = Configuration.AppTitle, SnapShotFile = Configuration.SnapShotFile, LogFiles = Configuration.LogFiles };
-        }
-
-        [AllowAnonymous]
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody] UserDto userDto) {
-            bool valid = CridentialsValidator.Verify($"{userDto.Username}:{userDto.Password}");
-
-            if (!valid) {
-                return BadRequest("Username or password is incorrect");
-            }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Configuration.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor {
-                Subject = new ClaimsIdentity(new Claim[] {
-                new Claim(ClaimTypes.Name, userDto.Username)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            return Ok(new AuthResponseDto { Token = tokenString, Username = userDto.Username });
         }
 
         [HttpGet("[action]")]
@@ -111,22 +78,6 @@ namespace ReactRedux.Controllers {
             List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.LogPath}{filename}");
             string line = string.Join("\n", lines);
             return new TxtDto() { Text = line };
-        }
-
-        [HttpGet("[action]")]
-        public TxtDto GetSnapshotToken() {
-            return new TxtDto() { Text = NowTokenManager.GenerateToken() };
-        }
-
-        [HttpGet("[action]")]
-        [AllowAnonymous]
-        public IActionResult Image(string token) {
-            if (!NowTokenManager.ValidateToken(token)) {
-                return BadRequest("Incorrect token");
-            }
-
-            var file = $"{Configuration.SnapShotPath}{Configuration.SnapShotFile}";
-            return PhysicalFile(file, "image/jpg");
         }
     }
 }
