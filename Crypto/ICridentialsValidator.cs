@@ -1,5 +1,5 @@
 namespace ReactRedux.Crypto {
     public interface ICridentialsValidator {
-         bool Verify(string usernamePassword);
+         bool Verify(string username, string password);
     }
 }

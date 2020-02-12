@@ -26,7 +26,7 @@ namespace ReactRedux.Controllers {
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] UserDto userDto) {
-            bool valid = CridentialsValidator.Verify($"{userDto.Username}:{userDto.Password}");
+            bool valid = CridentialsValidator.Verify(userDto.Username, userDto.Password);
 
             if (!valid) {
                 Logger.LogInformation($"User \"{userDto.Username}\" not accepted.");

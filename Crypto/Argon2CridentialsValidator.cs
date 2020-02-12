@@ -9,7 +9,8 @@ namespace ReactRedux.Crypto {
             Configuration = configuration;
         }
 
-        public bool Verify(string usernamePassword) {
+        public bool Verify(string username, string password) {
+            string usernamePassword = $"{username}:{password}";
             Argon2Config config = GetArgon2Config(usernamePassword);
             bool verified = Argon2.Verify(Configuration.AuthToken, config);
             return verified;
