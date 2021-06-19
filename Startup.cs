@@ -34,7 +34,7 @@ namespace ReactRedux {
             AppConfiguration appConfiguration = new AppConfiguration(Configuration);
             appConfiguration.Validate();
 
-            var key = Encoding.ASCII.GetBytes(appConfiguration.Secret);
+            byte[] key = Encoding.ASCII.GetBytes(appConfiguration.Secret);
             services.AddAuthentication(x => {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

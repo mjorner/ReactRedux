@@ -22,6 +22,7 @@ namespace ReactRedux {
         public int GraphConcurrencyCount => TryParseIntWithDefault("graph_concurrency_count", 10);
         public int GraphLineCount => TryParseIntWithDefault("graph_line_count", 50000);
         public string Secret => TryParseStringEmptyDefault("secret");
+        public int JWTExpireDayCount => TryParseIntWithDefault("jwt_expire_day_count", 7);
         
         private string TryParseStringEmptyDefault(string key) {
             string s = Configuration[key];

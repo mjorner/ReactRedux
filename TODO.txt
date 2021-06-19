@@ -1,1 +1,4 @@
 Add picture album of latest taken snap shots
+Use something different for Argon2 secret. Not really needed.
+(x) Make JWT expire day count configureable
+use IOptionsMonitor for monitoring changes to configuration.

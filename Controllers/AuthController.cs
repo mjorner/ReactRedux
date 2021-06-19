@@ -34,17 +34,18 @@ namespace ReactRedux.Controllers {
             }
 
             Logger.LogInformation($"User \"{userDto.Username}\" accepted.");
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Configuration.Secret);
+            
+            byte[] key = Encoding.ASCII.GetBytes(Configuration.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor {
                 Subject = new ClaimsIdentity(new Claim[] {
                 new Claim(ClaimTypes.Name, userDto.Username)
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddDays(Configuration.JWTExpireDayCount),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            string tokenString = tokenHandler.WriteToken(token);
 
             return Ok(new AuthResponseDto { Token = tokenString, Username = userDto.Username });
         }

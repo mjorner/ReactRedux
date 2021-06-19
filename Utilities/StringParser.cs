@@ -22,6 +22,7 @@ namespace ReactRedux.Utilities {
                 return false;
             }
             reading.DateTime = new string(new Span<char>(line, 0, length - 1));
+            reading.DateTime = reading.DateTime.Replace(' ', 'T');
             for (int i = 0; i < columnIndex; i++) {
                 start += length;
                 if (!FindPartLength(line, ';', start, out length)) {
