@@ -2,3 +2,4 @@
 //setx ASPNETCORE_ENVIRONMENT "Development" windows
 //export ASPNETCORE_ENVIRONMENT="Development" Linux
 //dotnet publish -c Release -r linux-arm
+//dotnet publish -c Release -r linux-arm --self-contained
