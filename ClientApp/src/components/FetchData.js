@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Plot from 'react-plotly.js';
+import Plotly from 'plotly.js-basic-dist-min'
+import createPlotlyComponent from 'react-plotly.js/factory';
 import './FetchData.css';
 import no_graph from '../../src/no_graph.png'
 import Dropdown from 'react-dropdown'
@@ -132,6 +133,7 @@ class FetchData extends Component {
   }
 
   renderGraph(xVals, yVals, avgs, graphTitle) {
+    const Plot = createPlotlyComponent(Plotly);
     return (
       <Plot
         data={[

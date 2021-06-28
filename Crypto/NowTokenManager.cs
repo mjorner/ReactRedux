@@ -3,7 +3,7 @@ using System.Text;
 using System.Security.Cryptography;
 
 namespace ReactRedux.Crypto {
-    public class NowTokenManager : INowTokenManager {
+    internal sealed class NowTokenManager : INowTokenManager {
         private readonly AppConfiguration Configuration;
         public NowTokenManager(AppConfiguration configuration) {
             Configuration = configuration;

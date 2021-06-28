@@ -4,6 +4,27 @@ using ReactRedux.Dtos;
 
 namespace ReactRedux.Utilities {
     internal static class StringParser {
+        public static int ParseValueReadings(FileReadContainer fileReadContainer, int columnIndex, string timeSpan) {
+            int count = 0;
+            DateTime? first = null;
+            for (int i = fileReadContainer.CurrentLineCount; i > 0; i--) {
+                if (fileReadContainer.Values[count] == null) {
+                    fileReadContainer.Values[count] = new ValueReadingDto();
+                }
+                if (StringParser.TryParseLine(fileReadContainer.Lines[i - 1].Chars, columnIndex, fileReadContainer.Values[count])) {
+                    DateTime dt = DateTime.Parse(fileReadContainer.Values[count].DateTime);
+                    if (!first.HasValue) {
+                        first = dt;
+                    }
+                    if (!TimePeriods.IsDateWithinBoundry(dt, first.Value, timeSpan)) {
+                        break;
+                    }
+                    count++;
+                }
+            }
+            return count;
+        }
+
         private static bool FindPartLength(char[] line, char separator, int start, out int length) {
             length = 0;
             for (int i = start; i < line.Length; i++) {
@@ -37,27 +58,6 @@ namespace ReactRedux.Utilities {
                 Console.WriteLine($"Unable to parse double: {line}");
             }
             return false;
-        }
-
-        public static int ParseValueReadings(FileReadContainer fileReadContainer, int columnIndex, string timeSpan) {
-            int count = 0;
-            DateTime? first = null;
-            for (int i = fileReadContainer.CurrentLineCount; i > 0; i--) {
-                if (fileReadContainer.Values[count] == null) {
-                    fileReadContainer.Values[count] = new ValueReadingDto();
-                }
-                if (StringParser.TryParseLine(fileReadContainer.Lines[i - 1].Chars, columnIndex, fileReadContainer.Values[count])) {
-                    DateTime dt = DateTime.Parse(fileReadContainer.Values[count].DateTime);
-                    if (!first.HasValue) {
-                        first = dt;
-                    }
-                    if (!TimePeriods.IsDateWithinBoundry(dt, first.Value, timeSpan)) {
-                        break;
-                    }
-                    count++;
-                }
-            }
-            return count;
         }
     }
 }

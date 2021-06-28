@@ -50,13 +50,16 @@ namespace ReactRedux.Controllers {
                 return new CopmpressedDataDto() { Base64Bytes = StringCompressor.Compress(new ValueReadingDto[0]) };
             }
             FileReadContainer fileReadContainer = FileReadContainerPool.Rent();
-            await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{fileName}", fileReadContainer);
-            Logger.LogTrace($"Read {fileReadContainer.CurrentLineCount} for {fileName}.");
-            int count = StringParser.ParseValueReadings(fileReadContainer, columnIndex, timeSpan);
-            Logger.LogTrace($"Parsed {count-1} lines for {fileName} with {timeSpan}.");
-            string str = StringCompressor.Compress(fileReadContainer.Values.Take(count - 1));
-            FileReadContainerPool.Return(fileReadContainer);
-            return new CopmpressedDataDto() { Base64Bytes = str };
+            try {
+                await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{fileName}", fileReadContainer);
+                Logger.LogTrace($"Read {fileReadContainer.CurrentLineCount} for {fileName}.");
+                int count = StringParser.ParseValueReadings(fileReadContainer, columnIndex, timeSpan);
+                Logger.LogTrace($"Parsed {count-1} lines for {fileName} with {timeSpan}.");
+                string str = StringCompressor.Compress(fileReadContainer.Values.Take(count - 1));
+                return new CopmpressedDataDto() { Base64Bytes = str };
+            } finally {
+                FileReadContainerPool.Return(fileReadContainer);
+            }
         }
 
         [HttpGet("[action]")]

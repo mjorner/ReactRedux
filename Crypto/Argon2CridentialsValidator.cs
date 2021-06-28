@@ -2,8 +2,8 @@ using System.Text;
 using Isopoh.Cryptography.Argon2;
 
 namespace ReactRedux.Crypto {
-    public class Argon2CridentialsValidator : ICridentialsValidator {
-        protected readonly AppConfiguration Configuration;
+    internal sealed class Argon2CridentialsValidator : ICridentialsValidator {
+        private readonly AppConfiguration Configuration;
 
         public Argon2CridentialsValidator(AppConfiguration configuration) {
             Configuration = configuration;
