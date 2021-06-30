@@ -140,7 +140,7 @@ class FetchData extends Component {
           { name: 'value', type: 'line', shape: 'spline',  x: xVals, y: yVals, line: { color: 'rgb(55, 128, 191)'} },
           { name: '10p avg', type: 'line', shape: 'spline', x: xVals, y: avgs, line: { color: 'rgb(128, 0, 128)'} }
         ]}
-        layout={{ dragmode: 'turntable', height: 300, autosize: false, margin: {
+        layout={{ dragmode: false, height: 300, xaxis:{fixedrange:true}, yaxis:{fixedrange:true}, autosize: false, margin: {
           l: 50,
           r: 0,
           b: 50,
