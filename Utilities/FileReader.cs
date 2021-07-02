@@ -48,7 +48,7 @@ namespace ReactRedux.Utilities {
         }
 
         public Task<bool> ReadAllLinesAsync(string filePath, FileReadContainer fileReadContainer) {
-            return ReadAllLinesToFileReadContainerAsyncAsync(filePath, fileReadContainer);
+            return ReadAllLinesToFileReadContainerAsync(filePath, fileReadContainer);
         }
 
         private static void ReadLine(StreamReader reader, FileReadContainer fileReadContainer) {
@@ -66,7 +66,7 @@ namespace ReactRedux.Utilities {
             } while (ch != NEWLINE);
         }
 
-        private async Task<bool> ReadAllLinesToFileReadContainerAsyncAsync(string filePath, FileReadContainer fileReadContainer) {
+        private async Task<bool> ReadAllLinesToFileReadContainerAsync(string filePath, FileReadContainer fileReadContainer) {
             string[] lines = await System.IO.File.ReadAllLinesAsync(filePath, System.Text.Encoding.UTF8);
             if (lines.Length >= fileReadContainer.Lines.Length) {
                 throw new Exception($"Trying to read more lines than allocated by graph_line_count for {filePath}.");
@@ -88,7 +88,7 @@ namespace ReactRedux.Utilities {
                 }
                 fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[i] = text[i];
             }
-            fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[text.Length - 1] = NEWLINE;
+            fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[text.Length] = NEWLINE;
         }
     }
 }
