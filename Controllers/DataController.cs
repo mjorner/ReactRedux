@@ -38,8 +38,7 @@ namespace ReactRedux.Controllers {
 
         [HttpGet("[action]")]
         public async Task<IActionResult> GetFilenames() {
-            List<string> lines = await FileReader.ReadAllLinesAsync(Configuration.WebConfigPath);
-            string content = string.Join("", lines);
+            string content = await FileReader.ReadAllTextAsync(Configuration.WebConfigPath);
             List<ReadingFilenamesDto> list = JsonConvert.DeserializeObject<List<ReadingFilenamesDto>>(content);
             return CreatedAtAction(nameof(GetFilenames), new InitInfoDto() { FileNames = list, TimePeriods = TimePeriods.AllTimePeriods });
         }
@@ -64,22 +63,19 @@ namespace ReactRedux.Controllers {
 
         [HttpGet("[action]")]
         public async Task<OutResultDto> ReadOutFile(string filename, string title) {
-            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
-            string line = string.Join("", lines);
+            string line = await FileReader.ReadAllTextAsync($"{Configuration.DataPath}{filename}");
             return new OutResultDto() { Str = line, Title = title };
         }
 
         [HttpGet("[action]")]
         public async Task<TxtDto> ReadTextFile(string filename) {
-            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.DataPath}{filename}");
-            string line = string.Join("\n", lines);
+            string line = await FileReader.ReadAllTextAsync($"{Configuration.DataPath}{filename}");
             return new TxtDto() { Text = line };
         }
 
         [HttpGet("[action]")]
         public async Task<TxtDto> ReadSysLog(string filename) {
-            List<string> lines = await FileReader.ReadAllLinesAsync($"{Configuration.LogPath}{filename}");
-            string line = string.Join("\n", lines);
+            string line = await FileReader.ReadAllTextAsync($"{Configuration.LogPath}{filename}");
             return new TxtDto() { Text = line };
         }
     }

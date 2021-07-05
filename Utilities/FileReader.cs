@@ -47,6 +47,10 @@ namespace ReactRedux.Utilities {
             return lines.ToList();
         }
 
+        public Task<string> ReadAllTextAsync(string filePath) {
+            return System.IO.File.ReadAllTextAsync(filePath);
+        }
+
         public Task<bool> ReadAllLinesAsync(string filePath, FileReadContainer fileReadContainer) {
             return ReadAllLinesToFileReadContainerAsync(filePath, fileReadContainer);
         }
@@ -66,29 +70,33 @@ namespace ReactRedux.Utilities {
             } while (ch != NEWLINE);
         }
 
-        private async Task<bool> ReadAllLinesToFileReadContainerAsync(string filePath, FileReadContainer fileReadContainer) {
-            string[] lines = await System.IO.File.ReadAllLinesAsync(filePath, System.Text.Encoding.UTF8);
-            if (lines.Length >= fileReadContainer.Lines.Length) {
-                throw new Exception($"Trying to read more lines than allocated by graph_line_count for {filePath}.");
-            }
-            for (int i = 0; i < lines.Length; i++) {
-                AppendTextToFileReadContainer(fileReadContainer, lines[i]);
-                fileReadContainer.CurrentLineCount++;
+        private static async Task<bool> ReadAllLinesToFileReadContainerAsync(string filePath, FileReadContainer fileReadContainer) {
+            using var sourceStream =
+                new FileStream(
+                    filePath,
+                    FileMode.Open, FileAccess.Read, FileShare.Read,
+                    bufferSize : 4096, useAsync : true);
+
+            byte[] buffer = new byte[0x1000];
+            int numRead;
+            int currentCharPos = 0;
+            while ((numRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) != 0) {
+                for (int i = 0; i < numRead; i++) {
+                    char ch = Convert.ToChar(buffer[i]);
+                    if (fileReadContainer.Lines[fileReadContainer.CurrentLineCount] == null) {
+                        fileReadContainer.Lines[fileReadContainer.CurrentLineCount] = new TextLine(fileReadContainer.ConstantLineLength);
+                    }
+                    fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[currentCharPos++] = ch;
+                    if (currentCharPos >= fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars.Length) {
+                        throw new Exception("Trying to read more chars than allocated by graph_line_length");
+                    }
+                    if (ch == '\n') {
+                        fileReadContainer.CurrentLineCount++;
+                        currentCharPos = 0;
+                    }
+                }
             }
             return true;
-        }
-
-        private static void AppendTextToFileReadContainer(FileReadContainer fileReadContainer, string text) {
-            for (int i = 0; i < text.Length; i++) {
-                if (fileReadContainer.Lines[fileReadContainer.CurrentLineCount] == null) {
-                    fileReadContainer.Lines[fileReadContainer.CurrentLineCount] = new TextLine(fileReadContainer.ConstantLineLength);
-                }
-                if (i >= fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars.Length) {
-                    throw new Exception("Trying to read more chars than allocated by graph_line_length");
-                }
-                fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[i] = text[i];
-            }
-            fileReadContainer.Lines[fileReadContainer.CurrentLineCount].Chars[text.Length] = NEWLINE;
         }
     }
 }
