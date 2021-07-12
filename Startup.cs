@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -32,9 +33,9 @@ namespace ReactRedux {
 
             byte[] key = Encoding.ASCII.GetBytes(appConfiguration.Secret);
             services.AddAuthentication(x => {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(x => {
                     x.RequireHttpsMetadata = false;
                     x.SaveToken = true;
@@ -80,9 +81,16 @@ namespace ReactRedux {
                     pattern: "{controller}/{action=Index}/{id?}");
             });
 
+            app.Use((context, next) => {
+                if (!HttpMethods.IsGet(context.Request.Method)) {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    return System.Threading.Tasks.Task.CompletedTask;
+                }
+                return next();
+            });
+
             app.UseSpa(spa => {
                 spa.Options.SourcePath = "ClientApp";
-
                 if (env.IsDevelopment()) {
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
